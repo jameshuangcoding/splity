@@ -3,9 +3,116 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-// Full schema defined in Phase 1 — Bill, LineItem, Person, Assignment models
+// ─── Phase 2: groups multiple Bills ──────────────────────────────────────────
+model Event {
+  id        String    @id @default(cuid())
+  name      String
+  startDate DateTime?
+  endDate   DateTime?
+  userId    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  bills     Bill[]
+  user      User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+// ─── Top-level container ──────────────────────────────────────────────────────
+model Bill {
+  id        String     @id @default(cuid())
+  name      String     // "East Asia Apr-May '26" — used as payment memo
+  status    BillStatus @default(DRAFT)
+  eventId   String?    // null = standalone (Phase 1); linked = part of Event (Phase 2)
+  userId    String?    // null Phase 1; linked to User in Phase 2
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  event     Event?     @relation(fields: [eventId], references: [id])
+  user      User?      @relation(fields: [userId], references: [id])
+  receipts  Receipt[]
+  people    Person[]
+
+  @@index([userId])
+  @@index([eventId])
+}
+
+// ─── One scanned (or manually entered) receipt ────────────────────────────────
+model Receipt {
+  id          String     @id @default(cuid())
+  billId      String
+  label       String?    // optional label for multi-receipt bills
+  subtotal    Decimal?   @db.Decimal(10, 2)
+  taxAmount   Decimal?   @db.Decimal(10, 2)
+  tipAmount   Decimal?   @db.Decimal(10, 2)
+  totalAmount Decimal    @db.Decimal(10, 2)
+  taxRate     Decimal?   @db.Decimal(8, 6)  // derived: taxAmount ÷ subtotal
+  tipRate     Decimal?   @db.Decimal(8, 6)  // derived: tipAmount ÷ subtotal
+  ocrRaw      Json?      // raw Tabscanner response — kept for debugging
+  position    Int        @default(0)
+  createdAt   DateTime   @default(now())
+  bill        Bill       @relation(fields: [billId], references: [id], onDelete: Cascade)
+  lineItems   LineItem[]
+
+  @@index([billId])
+}
+
+// ─── Individual line on a receipt ─────────────────────────────────────────────
+model LineItem {
+  id          String       @id @default(cuid())
+  receiptId   String
+  name        String
+  price       Decimal      @db.Decimal(10, 2) // always positive
+  isDiscount  Boolean      @default(false)    // true = subtracted in calculation
+  position    Int                             // preserves receipt print order
+  receipt     Receipt      @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  assignments Assignment[]
+
+  @@index([receiptId])
+}
+
+// ─── Participant in a Bill ─────────────────────────────────────────────────────
+model Person {
+  id           String       @id @default(cuid())
+  billId       String
+  name         String
+  isPayer      Boolean      @default(false)  // absorbs rounding remainder
+  venmoHandle  String?
+  zelleContact String?
+  bill         Bill         @relation(fields: [billId], references: [id], onDelete: Cascade)
+  assignments  Assignment[]
+
+  @@index([billId])
+}
+
+// ─── Item-to-person mapping ────────────────────────────────────────────────────
+// One row per person per item. Split count = number of rows per lineItemId.
+model Assignment {
+  id         String   @id @default(cuid())
+  lineItemId String
+  personId   String
+  lineItem   LineItem @relation(fields: [lineItemId], references: [id], onDelete: Cascade)
+  person     Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([lineItemId, personId])
+  @@index([lineItemId])
+  @@index([personId])
+}
+
+// ─── Auth — scaffolded Phase 1, enforced Phase 2 ──────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  bills     Bill[]
+  events    Event[]
+}
+
+enum BillStatus {
+  DRAFT    // items may still be unassigned
+  COMPLETE // all items assigned, ready to send
+}
