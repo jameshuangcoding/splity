@@ -1,7 +1,14 @@
 # CLAUDE.md
 
 ## Project Status
-Splity is in **pre-implementation phase**. Design handoff is complete; Next.js codebase not yet scaffolded. `prototype/` is the visual/logic source of truth — not code to ship.
+Phases 0–2 complete. Currently on Phase 3 (Home Screen). See `CHECKLIST.md` for full status.
+
+## Starting a New Phase — Required Steps
+Before writing any code for a new phase:
+1. Read `CHECKLIST.md` — confirm which phase is next and what its checklist items are.
+2. Create a branch: `git checkout -b phase/<N>-<slug>` (e.g. `phase/3-home-screen`).
+3. Follow TDD: write tests first, implement to green, then commit.
+4. Minimum 80% coverage per phase. Run `npm test` before every PR.
 
 ## Tech Stack
 Next.js 14 (App Router) · PostgreSQL via Supabase · Prisma 6 ORM · Supabase Auth · Tailwind CSS v4 + shadcn/ui · Zustand 5 · Tabscanner OCR (proxied) · Vercel hosting

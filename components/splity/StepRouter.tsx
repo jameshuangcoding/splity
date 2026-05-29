@@ -2,18 +2,18 @@
 
 import { useBillStore } from "@/stores/bill-store";
 import { TopBar } from "./TopBar";
+import { HomeScreen } from "./screens/HomeScreen";
 
-// Placeholder screen — replaced in Phase 3+
+// Placeholder — replaced per-phase
 function PlaceholderScreen({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-3 text-sp-text-dim">
+    <div className="flex-1 flex flex-col items-center justify-center gap-3 text-sp-text-dim">
       <span className="text-[15px] font-medium">{label}</span>
     </div>
   );
 }
 
-const SCREEN_LABELS = [
-  "Home — Phase 3",
+const PLACEHOLDER_LABELS = [
   "Receipt Review — Phase 4",
   "People — Phase 5",
   "Assign — Phase 6",
@@ -46,12 +46,14 @@ export function StepRouter() {
       {/* Top spacer — clears the absolute TopBar */}
       <div className="h-[98px] flex-none" />
 
-      {/* Scrollable content area */}
-      <div
-        className="flex-1 overflow-y-auto overflow-x-hidden px-[18px]"
-        style={{ scrollbarWidth: "none" }}
-      >
-        <PlaceholderScreen label={SCREEN_LABELS[step] ?? "Unknown step"} />
+      {/* Screen slot — each screen owns its scroll area and dock */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {step === 0 && <HomeScreen />}
+        {step > 0 && (
+          <PlaceholderScreen
+            label={PLACEHOLDER_LABELS[step - 1] ?? "Unknown step"}
+          />
+        )}
       </div>
     </div>
   );
