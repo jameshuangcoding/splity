@@ -4,6 +4,8 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 **Status key:** 🔲 Not started · 🔄 In progress · ✅ Done
 
+> **TDD rule (all phases from here on):** write tests first, implement to green, then commit. Minimum 80% coverage per phase. Run `npm test` before every PR.
+
 ---
 
 ## Phase 0 — Project Scaffolding ✅
@@ -20,6 +22,10 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [x] Security headers in `next.config.mjs`
 - [x] Zustand store (`stores/bill-store.ts`), Prisma singleton, Supabase clients, shared types
 
+**Tests (retrofitted):**
+- [x] Jest + Playwright infra configured (`jest.config.ts`, `playwright.config.ts`, `npm test` / `test:coverage` / `test:e2e` scripts)
+- [x] `stores/bill-store` — step clamping, theme toggle, name, reset (11 tests)
+
 ---
 
 ## Phase 1 — Data Layer 🔄
@@ -33,7 +39,18 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] API route skeleton: `app/api/ocr/route.ts` (POST stub)
 - [ ] API route skeleton: `app/api/auth/route.ts` (stub)
 - [ ] `lib/supabase.ts` — Supabase client singleton
-- [ ] Supabase Auth scaffold: `/login` and `/signup` pages exist (no feature gates in Phase 1)
+- [x] Supabase Auth scaffold: `/login` and `/signup` pages exist (no feature gates in Phase 1)
+
+**Tests (retrofitted — 85 tests, 97.8% statements, 83.3% branches):**
+- [x] `lib/calculation/engine` — `round2`, `compute` (happy path + 6 edge cases), `toCSV` (24 tests)
+- [x] `lib/utils` — `cn`, `formatCurrency`, `handleError` (all 4 error types) (10 tests)
+- [x] `app/api/bills` — POST valid/invalid (5 tests)
+- [x] `app/api/bills/[billId]` — GET/PATCH/DELETE + 404 handling (7 tests)
+- [x] `app/api/bills/[billId]/assignments` — PUT valid/invalid/unassign + DELETE (5 tests)
+- [x] `app/api/bills/[billId]/people` + `[personId]` — POST/PATCH/DELETE (7 tests)
+- [x] `app/api/bills/[billId]/receipts` + `[receiptId]` — POST/PATCH/DELETE (7 tests)
+- [x] `app/api/ocr` — no file / no key / success / 502 (4 tests)
+- [x] `e2e/smoke.spec.ts` — Playwright config + smoke tests wired up
 
 ---
 
@@ -49,6 +66,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] `components/Dock.tsx` — bottom CTA dock with gradient fade-to-background
 - [ ] `app/layout.tsx` — theme toggle wires to `data-theme` on `<html>` (**instant snap — no CSS color transitions**)
 - [ ] `app/page.tsx` — `<StepRouter>` client component that reads `step` from store and renders the correct screen
+- [ ] **Tests:** TopBar renders correct segments; Ava gradient; Money count-up; theme snap (no CSS transition); component renders at 390px viewport
 
 ---
 
@@ -62,6 +80,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] Info line: "Under 2 minutes from scan to settled."
 - [ ] Dock: "Scan a receipt" CTA (camera icon, primary) + "Enter manually" CTA (ghost, edit icon)
 - [ ] Both CTAs advance `step` to 1; expense name writes to Zustand `name`
+- [ ] **Tests:** Home screen renders; name input updates store; CTA advances step
 
 ---
 
