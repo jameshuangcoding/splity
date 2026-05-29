@@ -70,6 +70,28 @@ describe("bill-store — name", () => {
   });
 });
 
+describe("bill-store — inputMode", () => {
+  it("starts with null inputMode", () => {
+    expect(useBillStore.getState().inputMode).toBeNull();
+  });
+
+  it("setInputMode sets scan", () => {
+    useBillStore.getState().setInputMode("scan");
+    expect(useBillStore.getState().inputMode).toBe("scan");
+  });
+
+  it("setInputMode sets manual", () => {
+    useBillStore.getState().setInputMode("manual");
+    expect(useBillStore.getState().inputMode).toBe("manual");
+  });
+
+  it("reset clears inputMode back to null", () => {
+    useBillStore.getState().setInputMode("scan");
+    useBillStore.getState().reset();
+    expect(useBillStore.getState().inputMode).toBeNull();
+  });
+});
+
 describe("bill-store — theme toggle", () => {
   it("toggleTheme switches from dark to light", () => {
     useBillStore.getState().toggleTheme();

@@ -1,10 +1,11 @@
 import { create } from "zustand";
-import type { Theme, StorePerson, StoreReceipt, Assignments } from "@/types";
+import type { Theme, InputMode, StorePerson, StoreReceipt, Assignments } from "@/types";
 
 interface BillStore {
   step: number;
   theme: Theme;
   name: string;
+  inputMode: InputMode | null;
   receipt: StoreReceipt;
   people: StorePerson[];
   assignments: Assignments;
@@ -15,6 +16,7 @@ interface BillStore {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   setName: (name: string) => void;
+  setInputMode: (mode: InputMode) => void;
   setReceipt: (receipt: StoreReceipt) => void;
   setPeople: (people: StorePerson[]) => void;
   setAssignments: (assignments: Assignments) => void;
@@ -39,6 +41,7 @@ const INITIAL_STATE = {
   step: 0,
   theme: "dark" as Theme,
   name: "",
+  inputMode: null as InputMode | null,
   receipt: DEFAULT_RECEIPT,
   people: DEFAULT_PEOPLE,
   assignments: {},
@@ -63,6 +66,7 @@ export const useBillStore = create<BillStore>((set) => ({
     }),
 
   setName: (name) => set({ name }),
+  setInputMode: (inputMode) => set({ inputMode }),
   setReceipt: (receipt) => set({ receipt }),
   setPeople: (people) => set({ people }),
   setAssignments: (assignments) => set({ assignments }),

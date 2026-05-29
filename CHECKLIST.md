@@ -71,17 +71,17 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 3 — Home Screen (Step 0) 🔲
+## Phase 3 — Home Screen (Step 0) ✅
 
 > User can name the expense and advance to receipt capture.
 
-- [ ] Brand row: Splity logo mark SVG + "Splity" wordmark + "no account needed" chip
-- [ ] Hero headline: "Split a bill, down to the cent." (38px / 800)
-- [ ] "This bill" card: large expense-name input (19px/700) + 3-up stat row (Items · People · Total)
-- [ ] Info line: "Under 2 minutes from scan to settled."
-- [ ] Dock: "Scan a receipt" CTA (camera icon, primary) + "Enter manually" CTA (ghost, edit icon)
-- [ ] Both CTAs advance `step` to 1; expense name writes to Zustand `name`
-- [ ] **Tests:** Home screen renders; name input updates store; CTA advances step
+- [x] Brand row: Splity logo mark SVG + "Splity" wordmark + "no account needed" chip
+- [x] Hero headline: "Split a bill, down to the cent." (38px / 800)
+- [x] "This bill" card: large expense-name input (19px/700) + 3-up stat row (Items · People · Total)
+- [x] Info line: "Under 2 minutes from scan to settled."
+- [x] Dock: "Scan a receipt" CTA (camera icon, primary) + "Enter manually" CTA (ghost, edit icon)
+- [x] Both CTAs advance `step` to 1; expense name writes to Zustand `name`
+- [x] **Tests:** 19 tests, 100% coverage (statements/branches/functions/lines)
 
 ---
 
