@@ -1,0 +1,213 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ─── Tailwind v4 theme — Splity design tokens ─────────────────────── */
+
+@theme inline {
+  /* Fonts */
+  --font-ui: var(--font-ui);
+  --font-num: var(--font-num);
+  --font-sans: var(--font-ui);
+  --font-mono: var(--font-num);
+
+  /* Radii */
+  --radius-sp-lg: 22px;
+  --radius-sp-md: 16px;
+  --radius-sp-sm: 11px;
+
+  /* Splity surface / text colors (mapped from CSS vars set per-theme) */
+  --color-sp-bg: var(--sp-bg);
+  --color-sp-surface: var(--sp-surface);
+  --color-sp-surface-2: var(--sp-surface-2);
+  --color-sp-surface-hi: var(--sp-surface-hi);
+  --color-sp-hairline: var(--sp-hairline);
+  --color-sp-hairline-2: var(--sp-hairline-2);
+  --color-sp-text: var(--sp-text);
+  --color-sp-text-dim: var(--sp-text-dim);
+  --color-sp-text-faint: var(--sp-text-faint);
+  --color-sp-accent: var(--sp-accent);
+  --color-sp-accent-press: var(--sp-accent-press);
+  --color-sp-accent-ink: var(--sp-accent-ink);
+  --color-sp-accent-tint: var(--sp-accent-tint);
+  --color-sp-pos: var(--sp-pos);
+  --color-sp-pos-tint: var(--sp-pos-tint);
+  --color-sp-scrim: var(--sp-scrim);
+
+  /* shadcn/ui semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius: 0.625rem;
+
+  /* Splity animations */
+  --animate-sp-in: sp-in 420ms cubic-bezier(0.4, 0, 0.1, 1) both;
+  --animate-sheet-up: sheet-up 340ms cubic-bezier(0.4, 0, 0.1, 1) both;
+  --animate-pop: pop 340ms cubic-bezier(0.4, 0, 0.1, 1);
+
+  @keyframes sp-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes sheet-up {
+    from {
+      transform: scale(0.965);
+      transform-origin: bottom;
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* ─── Splity theme tokens — set per data-theme attribute ────────────── */
+/* NEVER add transitions to color/background on [data-theme] — instant swap required */
+
+[data-theme="dark"] {
+  --sp-bg: #0c0e12;
+  --sp-surface: #14181f;
+  --sp-surface-2: #1c212b;
+  --sp-surface-hi: #232a36;
+  --sp-hairline: rgba(255, 255, 255, 0.08);
+  --sp-hairline-2: rgba(255, 255, 255, 0.14);
+  --sp-text: #f3f5f8;
+  --sp-text-dim: #99a2af;
+  --sp-text-faint: #5f6873;
+  --sp-accent: #ff7a4d;
+  --sp-accent-press: #ff6a36;
+  --sp-accent-ink: #ff9069;
+  --sp-accent-tint: rgba(255, 122, 77, 0.15);
+  --sp-accent-glow: 0 6px 22px rgba(255, 122, 77, 0.34);
+  --sp-pos: #3ddc97;
+  --sp-pos-tint: rgba(61, 220, 151, 0.14);
+  --sp-scrim: rgba(0, 0, 0, 0.6);
+  --sp-shadow: 0 12px 38px rgba(0, 0, 0, 0.46);
+  --sp-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.34);
+
+  /* shadcn dark */
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+[data-theme="light"] {
+  --sp-bg: #eef0f3;
+  --sp-surface: #ffffff;
+  --sp-surface-2: #f3f5f8;
+  --sp-surface-hi: #e8eaed;
+  --sp-hairline: rgba(17, 23, 32, 0.08);
+  --sp-hairline-2: rgba(17, 23, 32, 0.13);
+  --sp-text: #14171c;
+  --sp-text-dim: #5d6573;
+  --sp-text-faint: #9aa1ac;
+  --sp-accent: #ff7a4d;
+  --sp-accent-press: #ef5f2c;
+  --sp-accent-ink: #cf4d22;
+  --sp-accent-tint: rgba(255, 122, 77, 0.13);
+  --sp-accent-glow: 0 6px 22px rgba(255, 122, 77, 0.28);
+  --sp-pos: #12a06a;
+  --sp-pos-tint: rgba(18, 160, 106, 0.13);
+  --sp-scrim: rgba(0, 0, 0, 0.35);
+  --sp-shadow: 0 14px 40px rgba(20, 26, 40, 0.14);
+  --sp-shadow-sm: 0 2px 8px rgba(20, 26, 40, 0.1);
+
+  /* shadcn light */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+/* ─── Base styles ───────────────────────────────────────────────────── */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-ui), system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Tabular numbers for all currency/money display */
+  .font-num {
+    font-family: var(--font-num), monospace;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Splity shadow utilities (can't express multi-value box-shadow in @theme) */
+  .shadow-sp-card {
+    box-shadow: var(--sp-shadow);
+  }
+  .shadow-sp-card-sm {
+    box-shadow: var(--sp-shadow-sm);
+  }
+  .shadow-sp-accent {
+    box-shadow: var(--sp-accent-glow);
+  }
+}

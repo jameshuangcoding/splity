@@ -4,7 +4,7 @@
 Splity is in **pre-implementation phase**. Design handoff is complete; Next.js codebase not yet scaffolded. `prototype/` is the visual/logic source of truth — not code to ship.
 
 ## Tech Stack
-Next.js 14 (App Router) · PostgreSQL via Supabase · Prisma ORM · Supabase Auth · Tailwind CSS + shadcn/ui · Zustand · Tabscanner OCR (proxied) · Vercel hosting
+Next.js 14 (App Router) · PostgreSQL via Supabase · Prisma 6 ORM · Supabase Auth · Tailwind CSS v4 + shadcn/ui · Zustand 5 · Tabscanner OCR (proxied) · Vercel hosting
 
 ## Architecture
 
