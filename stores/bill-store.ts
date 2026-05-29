@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import type { Theme, Person, Receipt, Assignments } from "@/types";
+import type { Theme, StorePerson, StoreReceipt, Assignments } from "@/types";
 
 interface BillStore {
   step: number;
   theme: Theme;
   name: string;
-  receipt: Receipt;
-  people: Person[];
+  receipt: StoreReceipt;
+  people: StorePerson[];
   assignments: Assignments;
 
   setStep: (step: number) => void;
@@ -15,13 +15,13 @@ interface BillStore {
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
   setName: (name: string) => void;
-  setReceipt: (receipt: Receipt) => void;
-  setPeople: (people: Person[]) => void;
+  setReceipt: (receipt: StoreReceipt) => void;
+  setPeople: (people: StorePerson[]) => void;
   setAssignments: (assignments: Assignments) => void;
   reset: () => void;
 }
 
-const DEFAULT_RECEIPT: Receipt = {
+const DEFAULT_RECEIPT: StoreReceipt = {
   subtotal: 0,
   tax: 0,
   tip: 0,
@@ -31,7 +31,7 @@ const DEFAULT_RECEIPT: Receipt = {
   items: [],
 };
 
-const DEFAULT_PEOPLE: Person[] = [
+const DEFAULT_PEOPLE: StorePerson[] = [
   { id: "you", name: "You", initial: "Y", color: "#ff7a4d", payer: true },
 ];
 

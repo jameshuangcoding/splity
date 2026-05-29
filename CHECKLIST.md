@@ -6,22 +6,23 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 0 — Project Scaffolding 🔲
+## Phase 0 — Project Scaffolding ✅
 
 > Stand up the repo from zero. After this phase `npm run dev` starts without errors and the design tokens render correctly in browser.
 
-- [ ] `npx create-next-app@14` with App Router, TypeScript, Tailwind CSS, ESLint
-- [ ] Extend `tailwind.config.ts` with Splity design tokens (colors, radii, shadows, font families, custom easing)
-- [ ] Add Google Fonts in `app/layout.tsx`: **Hanken Grotesk** (400/500/600/700/800) + **JetBrains Mono** (tabular nums)
-- [ ] Install and initialize **shadcn/ui**
-- [ ] Install **Zustand**, **Prisma**, **@supabase/supabase-js**
-- [ ] Create `.env.local.example` with `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `TABSCANNER_API_KEY`
-- [ ] Add PWA manifest at `public/manifest.json` and link meta tags in `app/layout.tsx`
-- [ ] Configure `next.config.ts` with PWA headers (theme-color, viewport, apple-touch-icon)
+- [x] `npx create-next-app@14` with App Router, TypeScript, Tailwind CSS v4, ESLint
+- [x] Design tokens in `app/globals.css` via Tailwind v4 `@theme` + `[data-theme]` dark/light vars
+- [x] Add Google Fonts in `app/layout.tsx`: **Hanken Grotesk** (400–800) + **JetBrains Mono** (tabular nums)
+- [x] Install and initialize **shadcn/ui** (v4 compatible)
+- [x] Install **Zustand 5**, **Prisma 6**, **@supabase/ssr**
+- [x] Create `.env.local.example` with all required variable names
+- [x] Add PWA manifest at `public/manifest.json` with meta tags in `app/layout.tsx`
+- [x] Security headers in `next.config.mjs`
+- [x] Zustand store (`stores/bill-store.ts`), Prisma singleton, Supabase clients, shared types
 
 ---
 
-## Phase 1 — Data Layer 🔲
+## Phase 1 — Data Layer 🔄
 
 > Schema and API skeletons before any UI. After this phase Prisma Studio shows correct tables and `compute()` is testable with sample data.
 
