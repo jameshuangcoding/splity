@@ -1,0 +1,30 @@
+# Next.js
+.next/
+out/
+node_modules/
+
+# Environment — commit .env.local.example, never the real thing
+.env
+.env.local
+.env.*.local
+
+# Prisma generated client
+prisma/generated/
+
+# Vercel
+.vercel
+
+# Build artifacts
+*.tsbuildinfo
+next-env.d.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local Claude plans (personal planning files, not project config)
+.claude/plans/

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Splity · Flow Wireframes</title>
+<link rel="stylesheet" href="wireframe.css" />
+<style>
+  html, body { margin: 0; height: 100%; background: #f0eee9; }
+  #root { height: 100%; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="wf-kit.jsx"></script>
+<script type="text/babel" src="screens-a.jsx"></script>
+<script type="text/babel" src="screens-b.jsx"></script>
+<script type="text/babel" src="screens-c.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": [
+    "#d2674a",
+    "#b14e33"
+  ],
+  "font": "Gaegu",
+  "frame": true
+}/*EDITMODE-END*/;
+
+// each artboard a touch larger than the 300×624 phone so the hand-drawn
+// border isn't clipped; phone centered on warm paper.
+const boardStyle = {
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  background: 'var(--paper-2)',
+};
+function board(id, label, children) {
+  return (
+    <DCArtboard key={id} id={id} label={label} width={316} height={642} style={boardStyle}>
+      {children}
+    </DCArtboard>
+  );
+}
+
+const STEPS = ['1 · Home', '2 · Receipt', '3 · People', '4 · Assign', '5 · Summary', '6 · Send'];
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(() => {
+    const r = document.documentElement.style;
+    const [a, ink] = t.accent;
+    r.setProperty('--accent', a);
+    r.setProperty('--accent-ink', ink);
+    r.setProperty('--accent-soft', a + '29');
+    const fonts = {
+      'Gaegu': "'Gaegu', cursive",
+      'Patrick Hand': "'Patrick Hand', cursive",
+      'Kalam': "'Kalam', cursive",
+    };
+    r.setProperty('--sk-font', fonts[t.font] || fonts.Gaegu);
+    document.body.classList.toggle('no-frame', !t.frame);
+  }, [t.accent, t.font, t.frame]);
+
+  const rowA = [<A_Home/>, <A_Receipt/>, <A_People/>, <A_Assign/>, <A_Summary/>, <A_Send/>];
+  const rowB = [<B_Home/>, <B_Receipt/>, <B_People/>, <B_Assign/>, <B_Summary/>, <B_Send/>];
+  const rowC = [<C_Home/>, <C_Receipt/>, <C_People/>, <C_Assign/>, <C_Summary/>, <C_Send/>];
+
+  return (
+    <React.Fragment>
+      <DesignCanvas>
+        <DCSection id="a" title="A · Linear Stepper" subtitle="Guided wizard — one decision per screen · tap an item, then tap who had it · step dots track progress">
+          {STEPS.map((s, i) => board('a' + i, s, rowA[i]))}
+        </DCSection>
+        <DCSection id="b" title="B · Live Ledger" subtitle="One dense surface, no steps — avatar rail pinned on top, running per-person tally pinned on the bottom, updates as you tap">
+          {STEPS.map((s, i) => board('b' + i, s, rowB[i]))}
+        </DCSection>
+        <DCSection id="c" title="C · Drag-to-Bucket" subtitle="Spatial &amp; visual — each receipt line is a card; drag dishes into per-person bins that total as they fill">
+          {STEPS.map((s, i) => board('c' + i, s, rowC[i]))}
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel>
+        <TweakSection label="Wireframe ink" />
+        <TweakColor label="Accent" value={t.accent}
+          options={[['#d2674a', '#b14e33'], ['#3f6fb0', '#2c5288'], ['#4f8a5b', '#3a6b44'], ['#8a5a8f', '#6d4571']]}
+          onChange={(v) => setTweak('accent', v)} />
+        <TweakSection label="Hand" />
+        <TweakRadio label="Sketch font" value={t.font}
+          options={['Gaegu', 'Patrick Hand', 'Kalam']}
+          onChange={(v) => setTweak('font', v)} />
+        <TweakToggle label="Phone frame" value={t.frame}
+          onChange={(v) => setTweak('frame', v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
