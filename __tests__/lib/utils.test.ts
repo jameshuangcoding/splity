@@ -1,7 +1,8 @@
 /**
  * @jest-environment node
  */
-import { cn, formatCurrency, handleError } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
+import { handleError } from "@/lib/server-utils";
 import { ZodError, z } from "zod";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
