@@ -28,17 +28,17 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 1 — Data Layer 🔄
+## Phase 1 — Data Layer ✅
 
 > Schema and API skeletons before any UI. After this phase Prisma Studio shows correct tables and `compute()` is testable with sample data.
 
-- [ ] Write `prisma/schema.prisma`: `Bill`, `LineItem`, `Person`, `Assignment` models with correct relations
-- [ ] `npx prisma migrate dev` against Supabase Postgres
-- [ ] Lift `compute()` + `toCSV()` from `prototype/splity-data.jsx` into `lib/calculation/engine.ts` (TypeScript port, no logic changes)
-- [ ] API route skeleton: `app/api/bills/route.ts` (GET/POST stubs)
-- [ ] API route skeleton: `app/api/ocr/route.ts` (POST stub)
-- [ ] API route skeleton: `app/api/auth/route.ts` (stub)
-- [ ] `lib/supabase.ts` — Supabase client singleton
+- [x] Write `prisma/schema.prisma`: `Bill`, `LineItem`, `Person`, `Assignment` models with correct relations
+- [x] `npx prisma migrate dev` against Supabase Postgres
+- [x] Lift `compute()` + `toCSV()` from `prototype/splity-data.jsx` into `lib/calculation/engine.ts` (TypeScript port, no logic changes)
+- [x] API route skeleton: `app/api/bills/route.ts` (GET/POST stubs)
+- [x] API route skeleton: `app/api/ocr/route.ts` (POST stub)
+- [x] API route skeleton: `app/api/auth/route.ts` (stub)
+- [x] `lib/supabase.ts` — Supabase client singleton
 - [x] Supabase Auth scaffold: `/login` and `/signup` pages exist (no feature gates in Phase 1)
 
 **Tests (retrofitted — 85 tests, 97.8% statements, 83.3% branches):**
@@ -54,19 +54,20 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 2 — UI Foundation 🔲
+## Phase 2 — UI Foundation ✅
 
 > Build the chrome and shared atoms used by every screen. After this phase the app shell renders with correct TopBar, theme toggle, and dock.
 
-- [ ] `lib/store.ts` — Zustand store with full shape: `step`, `theme`, `name`, `receipt`, `people`, `assignments`
-- [ ] `components/TopBar.tsx` — 6 progress segments + back chevron + theme toggle (sun/moon)
-- [ ] `components/Ava.tsx` — gradient avatar with `shade()` helper; sm / lg / ghost / off variants; overlapping stack
-- [ ] `components/Money.tsx` — animated count-up, cubic ease 520ms, respects `prefers-reduced-motion`
-- [ ] `components/ScreenHead.tsx` — eyebrow / title / sub block
-- [ ] `components/Dock.tsx` — bottom CTA dock with gradient fade-to-background
-- [ ] `app/layout.tsx` — theme toggle wires to `data-theme` on `<html>` (**instant snap — no CSS color transitions**)
-- [ ] `app/page.tsx` — `<StepRouter>` client component that reads `step` from store and renders the correct screen
-- [ ] **Tests:** TopBar renders correct segments; Ava gradient; Money count-up; theme snap (no CSS transition); component renders at 390px viewport
+- [x] `stores/bill-store.ts` — Zustand store with full shape: `step`, `theme`, `name`, `receipt`, `people`, `assignments` (already complete from Phase 0)
+- [x] `components/splity/TopBar.tsx` — 6 progress segments + back chevron + theme toggle (sun/moon)
+- [x] `components/splity/Ava.tsx` — gradient avatar with `shade()` helper; sm / lg / ghost / off variants; overlapping stack
+- [x] `components/splity/Money.tsx` — animated count-up, cubic ease 520ms, respects `prefers-reduced-motion`
+- [x] `components/splity/ScreenHead.tsx` — eyebrow / title / sub block
+- [x] `components/splity/Dock.tsx` — bottom CTA dock with gradient fade-to-background
+- [x] `components/splity/Icon.tsx` — full SVG icon set (back, fwd, camera, edit, sun, moon, send, etc.)
+- [x] `app/layout.tsx` — theme toggle wires to `data-theme` on `<html>` (**instant snap — no CSS color transitions**)
+- [x] `app/page.tsx` — `<StepRouter>` client component that reads `step` from store and renders the correct screen
+- [x] **Tests:** TopBar renders correct segments; Ava gradient; Money count-up; theme snap (no CSS transition); component renders at 390px viewport (45 tests, all passing)
 
 ---
 

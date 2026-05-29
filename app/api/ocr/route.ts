@@ -1,7 +1,7 @@
 // Proxies receipt images to Tabscanner — keeps TABSCANNER_API_KEY server-side.
 
 import { NextRequest, NextResponse } from "next/server";
-import { handleError } from "@/lib/utils";
+import { handleError } from "@/lib/server-utils";
 
 export async function POST(req: NextRequest) {
   try {

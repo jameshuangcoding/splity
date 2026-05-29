@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { handleError } from "@/lib/utils";
+import { handleError } from "@/lib/server-utils";
 
 const AssignmentSchema = z.object({
   lineItemId: z.string().cuid(),
