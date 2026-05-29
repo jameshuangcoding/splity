@@ -4,6 +4,7 @@ import { useBillStore } from "@/stores/bill-store";
 import { Icon } from "@/components/splity/Icon";
 import { Dock } from "@/components/splity/Dock";
 import { Money } from "@/components/splity/Money";
+import { Stat } from "@/components/splity/Stat";
 
 function Mark({ size }: { size: number }) {
   return (
@@ -27,19 +28,14 @@ function Mark({ size }: { size: number }) {
   );
 }
 
-function Stat({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex-1 flex flex-col items-center bg-sp-surface-2 rounded-sp-sm py-[10px] px-2 gap-[3px]">
-      <span className="text-[11px] font-bold tracking-[0.1em] uppercase text-sp-text-faint">
-        {label}
-      </span>
-      <span className="text-[15px] font-bold text-sp-text">{children}</span>
-    </div>
-  );
-}
-
 export function HomeScreen() {
-  const { name, setName, receipt, people, nextStep } = useBillStore();
+  const name = useBillStore((s) => s.name);
+  const setName = useBillStore((s) => s.setName);
+  const setInputMode = useBillStore((s) => s.setInputMode);
+  const nextStep = useBillStore((s) => s.nextStep);
+  const itemsCount = useBillStore((s) => s.receipt.items.length);
+  const peopleCount = useBillStore((s) => s.people.length);
+  const total = useBillStore((s) => s.receipt.total);
 
   return (
     <>
@@ -85,10 +81,10 @@ export function HomeScreen() {
               aria-label="Expense name"
             />
             <div className="flex gap-[9px] mt-3">
-              <Stat label="Items">{receipt.items.length}</Stat>
-              <Stat label="People">{people.length}</Stat>
+              <Stat label="Items">{itemsCount}</Stat>
+              <Stat label="People">{peopleCount}</Stat>
               <Stat label="Total">
-                <Money value={receipt.total} />
+                <Money value={total} />
               </Stat>
             </div>
           </div>
@@ -111,7 +107,10 @@ export function HomeScreen() {
               Scan a receipt
             </>
           ),
-          onClick: nextStep,
+          onClick: () => {
+            setInputMode("scan");
+            nextStep();
+          },
         }}
         ghost={{
           label: (
@@ -120,7 +119,10 @@ export function HomeScreen() {
               Enter manually
             </>
           ),
-          onClick: nextStep,
+          onClick: () => {
+            setInputMode("manual");
+            nextStep();
+          },
         }}
       />
     </>

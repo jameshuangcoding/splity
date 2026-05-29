@@ -154,15 +154,17 @@ describe("<HomeScreen />", () => {
     ).toBeInTheDocument();
   });
 
-  it("'Scan a receipt' advances step to 1", () => {
+  it("'Scan a receipt' advances step to 1 and sets inputMode to 'scan'", () => {
     render(<HomeScreen />);
     fireEvent.click(screen.getByRole("button", { name: /scan a receipt/i }));
     expect(useBillStore.getState().step).toBe(1);
+    expect(useBillStore.getState().inputMode).toBe("scan");
   });
 
-  it("'Enter manually' advances step to 1", () => {
+  it("'Enter manually' advances step to 1 and sets inputMode to 'manual'", () => {
     render(<HomeScreen />);
     fireEvent.click(screen.getByRole("button", { name: /enter manually/i }));
     expect(useBillStore.getState().step).toBe(1);
+    expect(useBillStore.getState().inputMode).toBe("manual");
   });
 });

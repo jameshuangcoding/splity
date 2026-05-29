@@ -52,6 +52,7 @@ export type PersonBillResult = {
 // ─── Zustand store types ──────────────────────────────────────────────────────
 
 export type Theme = "dark" | "light";
+export type InputMode = "scan" | "manual";
 
 export interface StorePerson {
   id: string;

@@ -22,7 +22,10 @@ const PLACEHOLDER_LABELS = [
 ];
 
 export function StepRouter() {
-  const { step, theme, prevStep, toggleTheme } = useBillStore();
+  const step = useBillStore((s) => s.step);
+  const theme = useBillStore((s) => s.theme);
+  const prevStep = useBillStore((s) => s.prevStep);
+  const toggleTheme = useBillStore((s) => s.toggleTheme);
 
   return (
     <div
