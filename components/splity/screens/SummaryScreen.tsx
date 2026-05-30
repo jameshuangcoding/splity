@@ -109,11 +109,20 @@ export function SummaryScreen() {
                 <div
                   key={person.id}
                   data-testid={`person-card-${person.id}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
                   className={cn(
                     "bg-sp-surface border border-sp-hairline rounded-sp-lg overflow-hidden shadow-sp-card-sm",
                     "cursor-pointer active:bg-sp-surface-2"
                   )}
                   onClick={() => toggleCard(person.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleCard(person.id);
+                    }
+                  }}
                 >
                   {/* Card header row */}
                   <div className="flex items-center gap-3 px-4 py-[14px]">

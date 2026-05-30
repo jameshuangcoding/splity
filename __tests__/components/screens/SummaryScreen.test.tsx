@@ -261,10 +261,34 @@ describe("<SummaryScreen /> — edge cases", () => {
 // ── Math correctness ──────────────────────────────────────────────────────────
 
 describe("<SummaryScreen /> — math", () => {
-  it("per-person totals sum to receipt total exactly", () => {
+  it("per-person totals sum to receipt total exactly even with rounding drift", () => {
+    // $10 item split 3 ways + 10% tax → each raw share = $3.666… rounds to $3.67,
+    // so two non-payers get $3.67 and the payer absorbs the remainder ($3.66).
+    // Σ = $3.66 + $3.67 + $3.67 = $11.00 exactly — exercises payer remainder logic.
+    const MESSY_RECEIPT = {
+      subtotal: 10.0,
+      tax: 1.0,
+      tip: 0,
+      discount: 0,
+      total: 11.0,
+      place: "Messy Cafe",
+      items: [{ id: "i1", name: "Shared Dish", price: 10.0 }],
+    };
+    const THREE_PEOPLE = [
+      { id: "you", name: "You", initial: "Y", color: "#ff7a4d", payer: true },
+      { id: "b", name: "Bob", initial: "B", color: "#3ddc97", payer: false },
+      { id: "c", name: "Carol", initial: "C", color: "#5b8cff", payer: false },
+    ];
+    act(() => {
+      useBillStore.getState().setReceipt(MESSY_RECEIPT);
+      useBillStore.getState().setPeople(THREE_PEOPLE);
+      useBillStore.getState().setAssignments({ i1: ["you", "b", "c"] });
+    });
     render(<SummaryScreen />);
     const state = useBillStore.getState();
-    const { compute } = jest.requireActual("@/lib/calculation/engine");
+    const { compute } = jest.requireActual<typeof import("@/lib/calculation/engine")>(
+      "@/lib/calculation/engine"
+    );
     const calc = compute(
       state.receipt,
       state.receipt.items,
@@ -272,10 +296,10 @@ describe("<SummaryScreen /> — math", () => {
       state.assignments
     );
     const sum = Object.values(calc.breakdown).reduce(
-      (acc, b) => acc + b.total,
+      (acc: number, b: { total: number }) => acc + b.total,
       0
     );
-    expect(Math.abs(sum - state.receipt.total)).toBeLessThan(0.01);
+    expect(sum).toBe(state.receipt.total);
   });
 });
 
