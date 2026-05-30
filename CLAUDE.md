@@ -9,6 +9,7 @@ Before writing any code for a new phase:
 2. Create a branch: `git checkout -b phase/<N>-<slug>` (e.g. `phase/3-home-screen`).
 3. Follow TDD: write tests first, implement to green, then commit.
 4. Minimum 80% coverage per phase. Run `npm test` before every PR.
+5. When the phase is complete: push the branch and open a PR with `gh pr create`.
 
 ## Tech Stack
 Next.js 14 (App Router) · PostgreSQL via Supabase · Prisma 6 ORM · Supabase Auth · Tailwind CSS v4 + shadcn/ui · Zustand 5 · Tabscanner OCR (proxied) · Vercel hosting
