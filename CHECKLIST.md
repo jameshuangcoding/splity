@@ -118,21 +118,21 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 6 — Assign Screen (Step 3) 🔲
+## Phase 6 — Assign Screen (Step 3) ✅
 
 > The core screen. Every assignment triggers a live recalculation.
 
-- [ ] Compact header: eyebrow + "Who had what?" + `n/m assigned` chip
-- [ ] Horizontal live rail: each person as `<Ava>` + `<Money>` running total beneath (animates on change)
-- [ ] Items card: each row = item name + price + avatar stack (assigned) or "tap to assign" chip (unassigned); `÷N ea` label when split
-- [ ] Tap item row → open `AssignSheet` bottom sheet
-- [ ] `AssignSheet`: item name + price + split note; 2-col grid of person toggles (selected = accent tint + check); "Everyone" ghost button + "Done" primary button
-- [ ] "Everyone" selects all people in one tap
-- [ ] "Done" applies selection → recomputes via `compute()` → updates Zustand `assignments`
-- [ ] "Split the remaining N evenly" line button appears when `!calc.fullyAssigned`
-- [ ] Sheet entrance animation: `scale(0.965 → 1)` from bottom + scrim fade
-- [ ] Dock CTA "See the breakdown →" advances to step 4
-- [ ] **Tests:** `AssignScreen` + `AssignSheet` — item assignment toggles; "Everyone" selects all; `compute()` called on Done; unassigned items show chip; live rail totals update; dock CTA advances step to 4; 80%+ coverage
+- [x] Compact header: eyebrow + "Who had what?" + `n/m assigned` chip
+- [x] Horizontal live rail: each person as `<Ava>` + `<Money>` running total beneath (animates on change)
+- [x] Items card: each row = item name + price + avatar stack (assigned) or "tap to assign" chip (unassigned); `÷N ea` label when split
+- [x] Tap item row → open `AssignSheet` bottom sheet
+- [x] `AssignSheet`: item name + price + split note; 2-col grid of person toggles (selected = accent tint + check); "Everyone" ghost button + "Done" primary button
+- [x] "Everyone" selects all people in one tap
+- [x] "Done" applies selection → recomputes via `compute()` → updates Zustand `assignments`
+- [x] "Split the remaining N evenly" line button appears when `!calc.fullyAssigned`
+- [x] Sheet entrance animation: `scale(0.965 → 1)` from bottom + scrim fade
+- [x] Dock CTA "See the breakdown →" advances to step 4
+- [x] **Tests:** `AssignScreen` + `AssignSheet` — 34 tests, 98.6% statement / 93.75% branch coverage
 
 ---
 
