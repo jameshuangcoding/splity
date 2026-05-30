@@ -149,21 +149,21 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 8 — Send Screen (Step 5) 🔲
+## Phase 8 — Send Screen (Step 5) ✅
 
 > Generate payment requests and export.
 
-- [ ] Title "Collect what you're owed" + memo chip `memo · "<expense name>"`
-- [ ] Per non-payer card: `<Ava>` + name + amount (21px/700)
-- [ ] Button row per person: **Venmo** · **Zelle** · **Copy** (icon-only buttons)
-- [ ] Venmo: opens deep link `venmo://paycharge?txn=pay&recipients=@user&amount=XX.XX&note=<name>`
-- [ ] Zelle: Web Share API with pre-filled message; clipboard fallback
-- [ ] Copy: writes `"<name> — $X.XX"` to clipboard
-- [ ] After action: row shows green "✓ venmo sent" / "✓ zelle sent" / "✓ copied" status
-- [ ] Toast notification: flashes near bottom, auto-dismisses after 1.9s
-- [ ] Dock: "Export to CSV" ghost CTA → `toCSV()` client-side → Blob download as `<expense-name>.csv`
-- [ ] Dock: "Done · new bill" primary CTA → resets Zustand store → back to step 0
-- [ ] **Tests:** `SendScreen` — Venmo deep link format correct; clipboard copy writes `"<name> — $X.XX"`; CSV download calls `toCSV()`; toast auto-dismisses after 1.9s; store resets on "Done · new bill"; 80%+ coverage
+- [x] Title "Collect what you're owed" + memo chip `memo · "<expense name>"`
+- [x] Per non-payer card: `<Ava>` + name + amount (21px/700)
+- [x] Button row per person: **Venmo** · **Zelle** · **Copy** (icon-only buttons)
+- [x] Venmo: opens deep link `venmo://paycharge?txn=pay&recipients=@user&amount=XX.XX&note=<name>`; gates success chip on `window.open` return value
+- [x] Zelle: Web Share API with pre-filled message; clipboard fallback; no false success when both APIs absent
+- [x] Copy: writes `"<name> — $X.XX"` to clipboard; guards with existence check + try/catch
+- [x] After action: row shows green "✓ venmo sent" / "✓ message ready" / "✓ copied" status
+- [x] Toast notification: flashes near bottom, auto-dismisses after 1.9s; `aria-live="polite"` for screen readers
+- [x] Dock: "Export to CSV" ghost CTA → `toCSV()` client-side → Blob download as `<expense-name>.csv`
+- [x] Dock: "Done · new bill" primary CTA → resets Zustand store → back to step 0
+- [x] **Tests:** 38 tests, 84.6% branch / 100% stmt coverage; Venmo deep link format, null gate, clipboard copy, clipboard guard, CSV download, toast a11y, store reset; 331 total passing
 
 ---
 
