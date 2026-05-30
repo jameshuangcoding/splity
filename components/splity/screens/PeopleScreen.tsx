@@ -12,6 +12,17 @@ import type { StorePerson } from "@/types";
 const PALETTE = ["#ff7a4d", "#3ddc97", "#5b8cff", "#c084fc"];
 const RECENT_NAMES = ["Diego", "Sam", "Aisha", "Theo"];
 
+// Picks the least-used palette color among current people.
+// Ties resolve by PALETTE order, giving the same round-robin as sequential adds
+// but staying correct after removals (unlike a length-based index).
+function nextColor(people: StorePerson[]): string {
+  const counts = new Map(PALETTE.map((c) => [c, 0]));
+  for (const p of people) {
+    if (counts.has(p.color)) counts.set(p.color, counts.get(p.color)! + 1);
+  }
+  return PALETTE.reduce((a, b) => (counts.get(a)! <= counts.get(b)! ? a : b));
+}
+
 export function PeopleScreen() {
   const people = useBillStore((s) => s.people);
   const setPeople = useBillStore((s) => s.setPeople);
@@ -26,7 +37,7 @@ export function PeopleScreen() {
       id: `person-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: trimmed,
       initial: trimmed[0].toUpperCase(),
-      color: PALETTE[people.length % PALETTE.length],
+      color: nextColor(people),
       payer: false,
     };
     setPeople([...people, newPerson]);
@@ -44,7 +55,7 @@ export function PeopleScreen() {
         style={{ scrollbarWidth: "none" }}
       >
         <div className="animate-sp-in">
-          <ScreenHead eyebrow="Step 2 of 5" title="Who's splitting?" />
+          <ScreenHead eyebrow="Step 2 · People" title="Who's splitting?" />
 
           {/* Add-name row */}
           <div className="flex gap-2 mb-4">

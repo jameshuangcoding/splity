@@ -152,6 +152,28 @@ describe("<PeopleScreen />", () => {
     expect(added[3]).toBe(PALETTE[0]); // wraps to 0
   });
 
+  it("color stays unique after removing a person then adding a new one", () => {
+    render(<PeopleScreen />);
+    const input = screen.getByRole("textbox", { name: /add a name/i });
+
+    // Add two people — they get PALETTE[1] and PALETTE[2]
+    fireEvent.change(input, { target: { value: "A" } });
+    fireEvent.click(screen.getByRole("button", { name: /add person/i }));
+    fireEvent.change(input, { target: { value: "B" } });
+    fireEvent.click(screen.getByRole("button", { name: /add person/i }));
+
+    // Remove A (PALETTE[1] is now free)
+    fireEvent.click(screen.getByRole("button", { name: /remove a/i }));
+
+    // Add C — should reuse PALETTE[1] (least used), not PALETTE[2] (B's color)
+    fireEvent.change(input, { target: { value: "C" } });
+    fireEvent.click(screen.getByRole("button", { name: /add person/i }));
+
+    const nonPayers = useBillStore.getState().people.filter((p) => !p.payer);
+    const colors = nonPayers.map((p) => p.color);
+    expect(new Set(colors).size).toBe(colors.length); // all unique
+  });
+
   it("new person has payer: false", () => {
     render(<PeopleScreen />);
     const input = screen.getByRole("textbox", { name: /add a name/i });

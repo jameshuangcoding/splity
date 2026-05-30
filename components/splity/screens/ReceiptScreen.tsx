@@ -396,7 +396,7 @@ export function ReceiptScreen() {
       >
         <div className="animate-sp-in">
           <ScreenHead
-            eyebrow="Step 2 · Review"
+            eyebrow="Step 1 · Review"
             title="Check the receipt"
             sub={
               showImageSlot
