@@ -169,9 +169,9 @@ describe("manual mode — review state", () => {
     expect(screen.getByText("Check the receipt")).toBeInTheDocument();
   });
 
-  it("renders the eyebrow 'Step 2 · Review'", () => {
+  it("renders the eyebrow 'Step 1 · Review'", () => {
     renderInManualMode();
-    expect(screen.getByText(/Step 2 · Review/i)).toBeInTheDocument();
+    expect(screen.getByText(/Step 1 · Review/i)).toBeInTheDocument();
   });
 
   it("renders the 'Add item' button", () => {

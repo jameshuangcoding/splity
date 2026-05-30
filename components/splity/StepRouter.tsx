@@ -4,6 +4,7 @@ import { useBillStore } from "@/stores/bill-store";
 import { TopBar } from "./TopBar";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ReceiptScreen } from "./screens/ReceiptScreen";
+import { PeopleScreen } from "./screens/PeopleScreen";
 
 // Placeholder — replaced per-phase
 function PlaceholderScreen({ label }: { label: string }) {
@@ -15,7 +16,6 @@ function PlaceholderScreen({ label }: { label: string }) {
 }
 
 const PLACEHOLDER_LABELS = [
-  "People — Phase 5",
   "Assign — Phase 6",
   "Summary — Phase 7",
   "Send — Phase 8",
@@ -53,9 +53,10 @@ export function StepRouter() {
       <div className="flex-1 flex flex-col min-h-0">
         {step === 0 && <HomeScreen />}
         {step === 1 && <ReceiptScreen />}
-        {step > 1 && (
+        {step === 2 && <PeopleScreen />}
+        {step > 2 && (
           <PlaceholderScreen
-            label={PLACEHOLDER_LABELS[step - 1] ?? "Unknown step"}
+            label={PLACEHOLDER_LABELS[step - 3] ?? "Unknown step"}
           />
         )}
       </div>
