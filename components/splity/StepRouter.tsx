@@ -7,19 +7,7 @@ import { ReceiptScreen } from "./screens/ReceiptScreen";
 import { PeopleScreen } from "./screens/PeopleScreen";
 import { AssignScreen } from "./screens/AssignScreen";
 import { SummaryScreen } from "./screens/SummaryScreen";
-
-// Placeholder — replaced per-phase
-function PlaceholderScreen({ label }: { label: string }) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-3 text-sp-text-dim">
-      <span className="text-[15px] font-medium">{label}</span>
-    </div>
-  );
-}
-
-const PLACEHOLDER_LABELS = [
-  "Send — Phase 8",
-];
+import { SendScreen } from "./screens/SendScreen";
 
 export function StepRouter() {
   const step = useBillStore((s) => s.step);
@@ -56,11 +44,7 @@ export function StepRouter() {
         {step === 2 && <PeopleScreen />}
         {step === 3 && <AssignScreen />}
         {step === 4 && <SummaryScreen />}
-        {step > 4 && (
-          <PlaceholderScreen
-            label={PLACEHOLDER_LABELS[step - 5] ?? "Unknown step"}
-          />
-        )}
+        {step === 5 && <SendScreen />}
       </div>
     </div>
   );

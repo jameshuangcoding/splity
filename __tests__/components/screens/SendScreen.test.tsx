@@ -196,6 +196,35 @@ describe("<SendScreen /> — Zelle", () => {
     });
     expect(screen.getByTestId("status-zelle-alice")).toBeInTheDocument();
   });
+
+  it("Zelle uses Web Share API when available", async () => {
+    Object.defineProperty(navigator, "share", {
+      writable: true,
+      value: jest.fn().mockResolvedValue(undefined),
+    });
+    render(<SendScreen />);
+    const [aliceZelle] = screen.getAllByRole("button", { name: /zelle/i });
+    await act(async () => {
+      fireEvent.click(aliceZelle);
+    });
+    expect(navigator.share).toHaveBeenCalledTimes(1);
+    const shareArg = (navigator.share as jest.Mock).mock.calls[0][0];
+    expect(shareArg.text).toMatch(/Alice/);
+    expect(shareArg.text).toMatch(/\$\d+\.\d{2}/);
+  });
+
+  it("Zelle still marks as sent when Web Share is cancelled (throws)", async () => {
+    Object.defineProperty(navigator, "share", {
+      writable: true,
+      value: jest.fn().mockRejectedValue(new Error("AbortError")),
+    });
+    render(<SendScreen />);
+    const [aliceZelle] = screen.getAllByRole("button", { name: /zelle/i });
+    await act(async () => {
+      fireEvent.click(aliceZelle);
+    });
+    expect(screen.getByTestId("status-zelle-alice")).toBeInTheDocument();
+  });
 });
 
 // ── Copy button ───────────────────────────────────────────────────────────────
@@ -275,38 +304,116 @@ describe("<SendScreen /> — CSV export", () => {
   });
 
   it("CSV export triggers a Blob download", () => {
+    render(<SendScreen />);
+
     const createSpy = jest.spyOn(URL, "createObjectURL").mockReturnValue("blob:fake");
     const appendSpy = jest.spyOn(document.body, "appendChild").mockImplementation((el) => el);
     const removeSpy = jest.spyOn(document.body, "removeChild").mockImplementation((el) => el);
 
-    render(<SendScreen />);
     fireEvent.click(screen.getByRole("button", { name: /export to csv/i }));
 
     expect(createSpy).toHaveBeenCalledTimes(1);
     const blobArg = createSpy.mock.calls[0][0];
     expect(blobArg).toBeInstanceOf(Blob);
 
+    createSpy.mockRestore();
     appendSpy.mockRestore();
     removeSpy.mockRestore();
   });
 
   it("CSV filename is '<expense-name>.csv'", () => {
+    render(<SendScreen />);
+
+    const anchorElements: HTMLAnchorElement[] = [];
     const createSpy = jest.spyOn(URL, "createObjectURL").mockReturnValue("blob:fake");
     const appendSpy = jest.spyOn(document.body, "appendChild").mockImplementation((el) => {
-      // Capture the anchor element to verify download attribute
-      if (el instanceof HTMLAnchorElement) {
-        expect(el.download).toBe("Dinner.csv");
-      }
+      if (el instanceof HTMLAnchorElement) anchorElements.push(el);
       return el;
     });
     const removeSpy = jest.spyOn(document.body, "removeChild").mockImplementation((el) => el);
 
-    render(<SendScreen />);
     fireEvent.click(screen.getByRole("button", { name: /export to csv/i }));
+
+    expect(anchorElements.length).toBe(1);
+    expect(anchorElements[0].download).toBe("Dinner.csv");
 
     createSpy.mockRestore();
     appendSpy.mockRestore();
     removeSpy.mockRestore();
+  });
+});
+
+// ── Empty name fallback ───────────────────────────────────────────────────────
+
+describe("<SendScreen /> — empty name fallback", () => {
+  it("memo chip shows 'Bill' when expense name is empty", () => {
+    act(() => {
+      useBillStore.setState({ name: "" });
+    });
+    render(<SendScreen />);
+    expect(screen.getByTestId("memo-chip")).toHaveTextContent("Bill");
+  });
+
+  it("Venmo note uses 'Bill' when expense name is empty", () => {
+    act(() => {
+      useBillStore.setState({ name: "" });
+    });
+    render(<SendScreen />);
+    const [aliceVenmo] = screen.getAllByRole("button", { name: /venmo/i });
+    fireEvent.click(aliceVenmo);
+    const url: string = mockWindowOpen.mock.calls[0][0];
+    expect(url).toContain("note=Bill");
+  });
+
+  it("Zelle message uses 'Bill' when expense name is empty", async () => {
+    act(() => {
+      useBillStore.setState({ name: "" });
+    });
+    render(<SendScreen />);
+    const [aliceZelle] = screen.getAllByRole("button", { name: /zelle/i });
+    await act(async () => {
+      fireEvent.click(aliceZelle);
+    });
+    const written = (navigator.clipboard.writeText as jest.Mock).mock.calls[0][0];
+    expect(written).toContain("Bill");
+  });
+
+  it("CSV export uses 'Bill' filename when expense name is empty", () => {
+    act(() => {
+      useBillStore.setState({ name: "" });
+    });
+    render(<SendScreen />);
+    const anchorElements: HTMLAnchorElement[] = [];
+    const createSpy = jest.spyOn(URL, "createObjectURL").mockReturnValue("blob:fake");
+    const appendSpy = jest.spyOn(document.body, "appendChild").mockImplementation((el) => {
+      if (el instanceof HTMLAnchorElement) anchorElements.push(el);
+      return el;
+    });
+    const removeSpy = jest.spyOn(document.body, "removeChild").mockImplementation((el) => el);
+    fireEvent.click(screen.getByRole("button", { name: /export to csv/i }));
+    expect(anchorElements[0]?.download).toBe("Bill.csv");
+    createSpy.mockRestore();
+    appendSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
+});
+
+// ── Toast timer de-dupe ───────────────────────────────────────────────────────
+
+describe("<SendScreen /> — toast timer", () => {
+  it("clicking two actions quickly replaces the prior toast (timer de-dup)", async () => {
+    render(<SendScreen />);
+    const venmoButtons = screen.getAllByRole("button", { name: /venmo/i });
+    const copyButtons = screen.getAllByRole("button", { name: /copy/i });
+    // First action — starts timer
+    fireEvent.click(venmoButtons[0]);
+    expect(screen.getByTestId("toast")).toBeInTheDocument();
+    // Second action immediately — clears first timer, starts new one
+    await act(async () => {
+      fireEvent.click(copyButtons[0]);
+    });
+    // Toast should still be visible (new timer running)
+    expect(screen.getByTestId("toast")).toBeInTheDocument();
   });
 });
 
