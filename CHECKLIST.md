@@ -136,16 +136,16 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 7 — Summary Screen (Step 4) 🔲
+## Phase 7 — Summary Screen (Step 4) ✅
 
 > Full per-person math shown; totals must sum to receipt exactly.
 
-- [ ] Hero total card: subtle accent-tint→surface gradient; expense name eyebrow; grand total `<Money>` 40px/800 with count-up; green "✓ matches receipt" chip; place + "split N ways"
-- [ ] One expandable card per person: `<Ava>` (lg) + name + `payer` chip + item count + total (22px/700) + chevron
-- [ ] Chevron rotates on expand; first person expanded by default
-- [ ] Expanded content: each assigned item with `÷N` share and per-person price; dashed divider; Item subtotal / +tax X.X% / +tip X.X% / −discount lines; payer rounding note ("Absorbs rounding remainder so the split sums exactly.")
-- [ ] Dock CTA "Send payment requests" (send icon) advances to step 5
-- [ ] **Tests:** `SummaryScreen` — per-person totals sum to receipt total exactly; expand/collapse cards; payer rounding note present; `<Money>` count-up renders; dock CTA advances step to 5; 80%+ coverage
+- [x] Hero total card: subtle accent-tint→surface gradient; expense name eyebrow; grand total `<Money>` 40px/800 with count-up; green "✓ matches receipt" chip; place + "split N ways"
+- [x] One expandable card per person: `<Ava>` (lg) + name + `payer` chip + item count + total (22px/700) + chevron
+- [x] Chevron rotates on expand; first person expanded by default
+- [x] Expanded content: each assigned item with `÷N` share and per-person price; dashed divider; Item subtotal / +tax X.X% / +tip X.X% / −discount lines; payer rounding note ("Absorbs rounding remainder so the split sums exactly.")
+- [x] Dock CTA "Send payment requests" (send icon) advances to step 5
+- [x] **Tests:** `SummaryScreen` — per-person totals sum to receipt total exactly; expand/collapse cards; payer rounding note present; `<Money>` count-up renders; dock CTA advances step to 5; 80%+ coverage (100% stmts/funcs/lines, 80% branches, 29 tests)
 
 ---
 

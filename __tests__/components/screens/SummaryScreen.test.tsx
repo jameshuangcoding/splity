@@ -230,6 +230,34 @@ describe("<SummaryScreen /> — expanded content", () => {
   });
 });
 
+// ── Edge cases ────────────────────────────────────────────────────────────────
+
+describe("<SummaryScreen /> — edge cases", () => {
+  it("shows 'No items assigned' when a person has no assignments", () => {
+    act(() => {
+      useBillStore.getState().setAssignments({ "item-1": ["you"], "item-2": ["you"] });
+    });
+    render(<SummaryScreen />);
+    fireEvent.click(screen.getByTestId("person-card-alice"));
+    expect(screen.getByText(/no items assigned/i)).toBeInTheDocument();
+  });
+
+  it("uses 'Bill' eyebrow when expense name is empty", () => {
+    act(() => {
+      useBillStore.setState({ name: "" });
+    });
+    render(<SummaryScreen />);
+    expect(screen.getByText("Bill")).toBeInTheDocument();
+  });
+
+  it("clicking inside expanded content does not collapse the card", () => {
+    render(<SummaryScreen />);
+    const expandedContent = screen.getByTestId("person-expanded-you");
+    fireEvent.click(expandedContent);
+    expect(screen.getByTestId("person-expanded-you")).toBeInTheDocument();
+  });
+});
+
 // ── Math correctness ──────────────────────────────────────────────────────────
 
 describe("<SummaryScreen /> — math", () => {
