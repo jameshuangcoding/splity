@@ -85,20 +85,22 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 4 — Receipt Review Screen (Step 1) + OCR 🔲
+## Phase 4 — Receipt Review Screen (Step 1) + OCR ✅
 
 > User scans or manually enters a receipt; all values are editable before proceeding.
 
-- [ ] `app/api/ocr/route.ts` — POST multipart image → Tabscanner → return structured JSON (API key stays server-side)
-- [ ] Camera capture: `<input type="file" accept="image/*" capture="environment">` for mobile
-- [ ] File upload fallback (JPG, PNG, HEIC, PDF)
-- [ ] Receipt image slot with place name and item count
-- [ ] Editable items list: tap to edit name or price inline; add / delete items
-- [ ] Totals card: Subtotal (editable) · Tax + rate chip `8.8%` (editable amount, derived rate) · Tip + rate chip (editable amount, derived rate) · Discount (editable, shown negative in accent) · Total (read-only, derived)
-- [ ] Tax/tip rate chips update live as amounts change: `(amount / subtotal * 100).toFixed(1)%`
-- [ ] Manual entry mode: all fields entered by hand with no image
-- [ ] Info note: "Rates derived from printed amounts, not assumed percentages."
-- [ ] All values write back to Zustand `receipt`; dock CTA "Looks right →" advances to step 2
+- [x] `app/api/ocr/route.ts` — POST multipart image → Tabscanner → return structured JSON (API key stays server-side)
+- [x] Camera capture: `<input type="file" accept="image/*" capture="environment">` for mobile
+- [x] File upload fallback (JPG, PNG, HEIC, PDF)
+- [x] Receipt image slot with place name and item count
+- [x] Editable items list: tap to edit name or price inline; add / delete items
+- [x] Totals card: Subtotal (editable) · Tax + rate chip `8.8%` (editable amount, derived rate) · Tip + rate chip (editable amount, derived rate) · Discount (editable, shown negative in accent) · Total (read-only, derived)
+- [x] Tax/tip rate chips update live as amounts change: `(amount / subtotal * 100).toFixed(1)%`
+- [x] Manual entry mode: all fields entered by hand with no image
+- [x] Info note: "Rates derived from printed amounts, not assumed percentages."
+- [x] All values write back to Zustand `receipt`; dock CTA "Looks right →" advances to step 2
+- [x] `lib/ocr.ts` — `normalizeOcrResponse()` maps Tabscanner JSON → StoreReceipt (handles nested result, fallback field names, string numbers, zero-price filtering)
+- [x] **Tests:** 48 screen tests + 19 OCR normalizer tests; 201 total passing
 
 ---
 

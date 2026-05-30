@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-// Phase 1: login exists but no feature is gated behind it.
-// Phase 2: add redirect-after-login and middleware enforcement.
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);

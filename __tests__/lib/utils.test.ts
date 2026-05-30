@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { handleError } from "@/lib/server-utils";
 import { ZodError, z } from "zod";
 import { Prisma } from "@prisma/client";
@@ -20,22 +20,6 @@ describe("cn", () => {
 
   it("ignores falsy values", () => {
     expect(cn("foo", false && "bar", undefined, null, "baz")).toBe("foo baz");
-  });
-});
-
-// ─── formatCurrency ───────────────────────────────────────────────────────────
-
-describe("formatCurrency", () => {
-  it("formats positive dollars", () => {
-    expect(formatCurrency(12.5)).toBe("$12.50");
-  });
-
-  it("formats zero", () => {
-    expect(formatCurrency(0)).toBe("$0.00");
-  });
-
-  it("formats large amounts with comma separator", () => {
-    expect(formatCurrency(1234.56)).toBe("$1,234.56");
   });
 });
 

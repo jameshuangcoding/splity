@@ -3,6 +3,7 @@
 import { useBillStore } from "@/stores/bill-store";
 import { TopBar } from "./TopBar";
 import { HomeScreen } from "./screens/HomeScreen";
+import { ReceiptScreen } from "./screens/ReceiptScreen";
 
 // Placeholder — replaced per-phase
 function PlaceholderScreen({ label }: { label: string }) {
@@ -14,7 +15,6 @@ function PlaceholderScreen({ label }: { label: string }) {
 }
 
 const PLACEHOLDER_LABELS = [
-  "Receipt Review — Phase 4",
   "People — Phase 5",
   "Assign — Phase 6",
   "Summary — Phase 7",
@@ -52,7 +52,8 @@ export function StepRouter() {
       {/* Screen slot — each screen owns its scroll area and dock */}
       <div className="flex-1 flex flex-col min-h-0">
         {step === 0 && <HomeScreen />}
-        {step > 0 && (
+        {step === 1 && <ReceiptScreen />}
+        {step > 1 && (
           <PlaceholderScreen
             label={PLACEHOLDER_LABELS[step - 1] ?? "Unknown step"}
           />
