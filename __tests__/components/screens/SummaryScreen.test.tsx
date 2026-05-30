@@ -75,9 +75,33 @@ describe("<SummaryScreen /> — hero card", () => {
     expect(screen.getByTestId("summary-grand-total")).toBeInTheDocument();
   });
 
-  it("renders '✓ matches receipt' chip", () => {
+  it("renders green 'matches receipt' chip when fully assigned and totals consistent", () => {
     render(<SummaryScreen />);
-    expect(screen.getByText(/matches receipt/i)).toBeInTheDocument();
+    expect(screen.getByTestId("chip-matches-receipt")).toBeInTheDocument();
+    expect(screen.queryByTestId("chip-receipt-warning")).not.toBeInTheDocument();
+  });
+
+  it("renders warning chip with unassigned count when items are not fully assigned", () => {
+    act(() => {
+      useBillStore.getState().setAssignments({ "item-1": ["you"] }); // item-2 unassigned
+    });
+    render(<SummaryScreen />);
+    expect(screen.getByTestId("chip-receipt-warning")).toBeInTheDocument();
+    expect(screen.getByText(/1 item unassigned/i)).toBeInTheDocument();
+    expect(screen.queryByTestId("chip-matches-receipt")).not.toBeInTheDocument();
+  });
+
+  it("renders warning chip when receipt subtotal + tax + tip − discount ≠ total", () => {
+    act(() => {
+      useBillStore.getState().setReceipt({
+        ...RECEIPT,
+        total: 99.99, // inconsistent with subtotal 40 + tax 3.6 + tip 6
+      });
+    });
+    render(<SummaryScreen />);
+    expect(screen.getByTestId("chip-receipt-warning")).toBeInTheDocument();
+    expect(screen.getByText(/don't add up/i)).toBeInTheDocument();
+    expect(screen.queryByTestId("chip-matches-receipt")).not.toBeInTheDocument();
   });
 
   it("renders place name", () => {

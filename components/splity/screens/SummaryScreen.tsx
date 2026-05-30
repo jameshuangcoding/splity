@@ -6,7 +6,7 @@ import { Ava } from "@/components/splity/Ava";
 import { Dock } from "@/components/splity/Dock";
 import { Money } from "@/components/splity/Money";
 import { Icon } from "@/components/splity/Icon";
-import { compute } from "@/lib/calculation/engine";
+import { compute, round2 } from "@/lib/calculation/engine";
 import { cn } from "@/lib/utils";
 
 export function SummaryScreen() {
@@ -32,6 +32,14 @@ export function SummaryScreen() {
   );
 
   const regularItems = receipt.items.filter((it) => !it.isDiscount);
+
+  const totalsConsistent =
+    round2(receipt.subtotal + receipt.tax + receipt.tip - receipt.discount) ===
+    round2(receipt.total);
+  const matchesReceipt = calc.fullyAssigned && totalsConsistent;
+  const warningReason = !calc.fullyAssigned
+    ? `${calc.itemCount - calc.assignedCount} item${calc.itemCount - calc.assignedCount === 1 ? "" : "s"} unassigned`
+    : "receipt totals don't add up";
 
   function toggleCard(personId: string) {
     setExpandedId((prev) => (prev === personId ? null : personId));
@@ -69,16 +77,31 @@ export function SummaryScreen() {
               />
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span
-                className={cn(
-                  "inline-flex items-center gap-[5px]",
-                  "text-[12px] font-semibold text-sp-pos",
-                  "bg-sp-pos-tint rounded-full px-[10px] py-[4px]"
-                )}
-              >
-                <Icon name="check" size={11} sw={2.5} />
-                matches receipt
-              </span>
+              {matchesReceipt ? (
+                <span
+                  data-testid="chip-matches-receipt"
+                  className={cn(
+                    "inline-flex items-center gap-[5px]",
+                    "text-[12px] font-semibold text-sp-pos",
+                    "bg-sp-pos-tint rounded-full px-[10px] py-[4px]"
+                  )}
+                >
+                  <Icon name="check" size={11} sw={2.5} />
+                  matches receipt
+                </span>
+              ) : (
+                <span
+                  data-testid="chip-receipt-warning"
+                  className={cn(
+                    "inline-flex items-center gap-[5px]",
+                    "text-[12px] font-semibold text-sp-neg",
+                    "bg-sp-neg-tint rounded-full px-[10px] py-[4px]"
+                  )}
+                >
+                  <Icon name="x" size={11} sw={2.5} />
+                  {warningReason}
+                </span>
+              )}
               {receipt.place && (
                 <span className="text-[12px] text-sp-text-dim font-medium">
                   {receipt.place}

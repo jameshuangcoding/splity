@@ -31,6 +31,8 @@
   --color-sp-accent-tint: var(--sp-accent-tint);
   --color-sp-pos: var(--sp-pos);
   --color-sp-pos-tint: var(--sp-pos-tint);
+  --color-sp-neg: var(--sp-neg);
+  --color-sp-neg-tint: var(--sp-neg-tint);
   --color-sp-scrim: var(--sp-scrim);
 
   /* shadcn/ui semantic colors */
@@ -115,6 +117,8 @@
   --sp-accent-glow: 0 6px 22px rgba(255, 122, 77, 0.34);
   --sp-pos: #3ddc97;
   --sp-pos-tint: rgba(61, 220, 151, 0.14);
+  --sp-neg: #ff5b5b;
+  --sp-neg-tint: rgba(255, 91, 91, 0.14);
   --sp-scrim: rgba(0, 0, 0, 0.6);
   --sp-shadow: 0 12px 38px rgba(0, 0, 0, 0.46);
   --sp-shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.34);
@@ -157,6 +161,8 @@
   --sp-accent-glow: 0 6px 22px rgba(255, 122, 77, 0.28);
   --sp-pos: #12a06a;
   --sp-pos-tint: rgba(18, 160, 106, 0.13);
+  --sp-neg: #e03434;
+  --sp-neg-tint: rgba(224, 52, 52, 0.13);
   --sp-scrim: rgba(0, 0, 0, 0.35);
   --sp-shadow: 0 14px 40px rgba(20, 26, 40, 0.14);
   --sp-shadow-sm: 0 2px 8px rgba(20, 26, 40, 0.1);
