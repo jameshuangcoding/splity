@@ -181,11 +181,8 @@ describe("manual mode — review state", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Subtotal, Tax, Tip, Discount editable inputs", () => {
+  it("renders Tax, Tip, Discount as editable inputs", () => {
     renderInManualMode();
-    expect(
-      screen.getByRole("textbox", { name: /subtotal/i })
-    ).toBeInTheDocument();
     expect(
       screen.getByRole("textbox", { name: /^tax$/i })
     ).toBeInTheDocument();
@@ -197,11 +194,15 @@ describe("manual mode — review state", () => {
     ).toBeInTheDocument();
   });
 
-  it("Total has no editable input (read-only derived)", () => {
+  it("Subtotal and Total have no editable inputs (both read-only derived)", () => {
     renderInManualMode();
+    expect(
+      screen.queryByRole("textbox", { name: /subtotal/i })
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("textbox", { name: /^total$/i })
     ).not.toBeInTheDocument();
+    expect(screen.getByText("Subtotal")).toBeInTheDocument();
     expect(screen.getByText("Total")).toBeInTheDocument();
   });
 
@@ -298,16 +299,16 @@ describe("items editing", () => {
 
 // ── Totals editing ────────────────────────────────────────────────────────────
 
-describe("totals editing", () => {
-  it("editing Subtotal updates the store on blur", () => {
-    renderInManualMode();
-    const input = screen.getByRole("textbox", { name: /subtotal/i });
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "49.25" } });
-    fireEvent.blur(input);
-    expect(useBillStore.getState().receipt.subtotal).toBe(49.25);
-  });
+// Helper: adds an item via the UI and saves it with the given price.
+// This triggers patch() → applyDerived() so subtotal is auto-computed.
+function addItemWithPrice(price: string) {
+  fireEvent.click(screen.getByRole("button", { name: /add item/i }));
+  const priceInput = screen.getByRole("textbox", { name: /item price/i });
+  fireEvent.change(priceInput, { target: { value: price } });
+  fireEvent.keyDown(priceInput, { key: "Enter" });
+}
 
+describe("totals editing", () => {
   it("editing Tax updates the store on blur", () => {
     renderInManualMode();
     const input = screen.getByRole("textbox", { name: /^tax$/i });
@@ -335,39 +336,38 @@ describe("totals editing", () => {
     expect(useBillStore.getState().receipt.discount).toBe(5.0);
   });
 
-  it("total is derived: equals subtotal when tax/tip/discount are 0", () => {
+  it("subtotal is derived from item prices", () => {
     renderInManualMode();
-    const input = screen.getByRole("textbox", { name: /subtotal/i });
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "49.25" } });
-    fireEvent.blur(input);
-    expect(useBillStore.getState().receipt.total).toBe(49.25);
+    addItemWithPrice("49.25");
+    expect(useBillStore.getState().receipt.subtotal).toBe(49.25);
   });
 
-  it("total is derived: subtotal + tax + tip - discount", () => {
+  it("total = subtotal + tax + tip - discount", () => {
     renderInManualMode();
-    const fields = [
-      { name: /subtotal/i, value: "49.25" },
-      { name: /^tax$/i, value: "4.31" },
-      { name: /^tip$/i, value: "9.75" },
-      { name: /discount/i, value: "5.00" },
-    ];
-    for (const { name, value } of fields) {
-      const input = screen.getByRole("textbox", { name });
-      fireEvent.focus(input);
-      fireEvent.change(input, { target: { value } });
-      fireEvent.blur(input);
-    }
+    addItemWithPrice("49.25");
+
+    const taxInput = screen.getByRole("textbox", { name: /^tax$/i });
+    fireEvent.focus(taxInput);
+    fireEvent.change(taxInput, { target: { value: "4.31" } });
+    fireEvent.blur(taxInput);
+
+    const tipInput = screen.getByRole("textbox", { name: /^tip$/i });
+    fireEvent.focus(tipInput);
+    fireEvent.change(tipInput, { target: { value: "9.75" } });
+    fireEvent.blur(tipInput);
+
+    const discInput = screen.getByRole("textbox", { name: /discount/i });
+    fireEvent.focus(discInput);
+    fireEvent.change(discInput, { target: { value: "5.00" } });
+    fireEvent.blur(discInput);
+
     // 49.25 + 4.31 + 9.75 - 5.00 = 58.31
     expect(useBillStore.getState().receipt.total).toBe(58.31);
   });
 
   it("rate chips appear when subtotal is non-zero", () => {
     renderInManualMode();
-    const subInput = screen.getByRole("textbox", { name: /subtotal/i });
-    fireEvent.focus(subInput);
-    fireEvent.change(subInput, { target: { value: "49.25" } });
-    fireEvent.blur(subInput);
+    addItemWithPrice("49.25");
 
     const taxInput = screen.getByRole("textbox", { name: /^tax$/i });
     fireEvent.focus(taxInput);

@@ -13,10 +13,11 @@ import type { StoreReceipt, StoreLineItem } from "@/types";
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-function deriveTotal(
-  r: Pick<StoreReceipt, "subtotal" | "tax" | "tip" | "discount">
-): number {
-  return r2(r.subtotal + r.tax + r.tip - r.discount);
+// Subtotal is always derived from items. Total is derived from all fields.
+function applyDerived(r: StoreReceipt): StoreReceipt {
+  const subtotal = r2(r.items.reduce((s, it) => s + it.price, 0));
+  const total = r2(subtotal + r.tax + r.tip - r.discount);
+  return { ...r, subtotal, total };
 }
 
 function genId() {
@@ -110,59 +111,70 @@ function ImageSlot({
 }
 
 // ── ItemRow ───────────────────────────────────────────────────────────────────
+// The edit container uses onBlur + relatedTarget to detect focus leaving the
+// row, so both name and price inputs stay open until the user is truly done.
 
 function ItemRow({
   item,
   isEditing,
   onStartEdit,
-  onSaveName,
-  onSavePrice,
+  onSave,
   onDelete,
 }: {
   item: StoreLineItem;
   isEditing: boolean;
   onStartEdit: () => void;
-  onSaveName: (name: string) => void;
-  onSavePrice: (price: number) => void;
+  onSave: (name: string, price: number) => void;
   onDelete: () => void;
 }) {
   const [localName, setLocalName] = useState(item.name);
   const [localPrice, setLocalPrice] = useState(item.price.toFixed(2));
   const nameRef = useRef<HTMLInputElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
 
+  // Sync local state only when edit mode opens (not on every item change).
   useEffect(() => {
     if (isEditing) {
       setLocalName(item.name);
       setLocalPrice(item.price.toFixed(2));
       nameRef.current?.focus();
     }
-  }, [isEditing, item.name, item.price]);
+  }, [isEditing]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function commitAndClose() {
+    onSave(localName.trim() || item.name, parseFloat(localPrice) || 0);
+  }
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-2 px-4 py-[10px] border-b border-sp-hairline last:border-0">
+      <div
+        className="flex items-center gap-2 px-4 py-[10px] border-b border-sp-hairline last:border-0"
+        onBlur={(e) => {
+          // Only exit when focus leaves the entire row container.
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            commitAndClose();
+          }
+        }}
+      >
         <input
           ref={nameRef}
           className="flex-1 bg-sp-surface-hi rounded-[8px] px-2.5 py-1.5 text-[15px] font-semibold text-sp-text focus:outline-none"
           value={localName}
           onChange={(e) => setLocalName(e.target.value)}
-          onBlur={() => onSaveName(localName.trim() || item.name)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
-            if (e.key === "Escape") {
-              setLocalName(item.name);
-              onSaveName(item.name);
-            }
+            if (e.key === "Enter") priceRef.current?.focus();
+            if (e.key === "Escape") commitAndClose();
           }}
           aria-label="Item name"
         />
         <input
+          ref={priceRef}
           className="w-[72px] bg-sp-surface-hi rounded-[8px] px-2.5 py-1.5 text-[15px] font-bold text-sp-text text-right focus:outline-none font-num"
           value={localPrice}
           onChange={(e) => setLocalPrice(e.target.value)}
-          onBlur={() => onSavePrice(parseFloat(localPrice) || 0)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+            if (e.key === "Enter") commitAndClose();
+            if (e.key === "Escape") commitAndClose();
           }}
           inputMode="decimal"
           aria-label="Item price"
@@ -298,9 +310,9 @@ export function ReceiptScreen() {
     };
   }, [imageUrl]);
 
-  function patch(updates: Partial<Omit<StoreReceipt, "total">>) {
-    const next = { ...receipt, ...updates };
-    next.total = deriveTotal(next);
+  // Writes a partial update to the store, auto-deriving subtotal and total.
+  function patch(updates: Partial<StoreReceipt>) {
+    const next = applyDerived({ ...receipt, ...updates });
     setReceipt(next);
   }
 
@@ -314,9 +326,7 @@ export function ReceiptScreen() {
       patch(normalizeOcrResponse(raw));
       setStatus("reviewing");
     } catch {
-      setOcrError(
-        "Couldn't read the receipt. Enter values manually below."
-      );
+      setOcrError("Couldn't read the receipt. Enter values manually below.");
       setStatus("reviewing");
     }
   }
@@ -326,15 +336,7 @@ export function ReceiptScreen() {
       URL.revokeObjectURL(imageUrl);
       setImageUrl(null);
     }
-    setReceipt({
-      subtotal: 0,
-      tax: 0,
-      tip: 0,
-      discount: 0,
-      total: 0,
-      place: "",
-      items: [],
-    });
+    setReceipt({ subtotal: 0, tax: 0, tip: 0, discount: 0, total: 0, place: "", items: [] });
     setStatus("uploading");
   }
 
@@ -344,16 +346,13 @@ export function ReceiptScreen() {
     setEditingItemId(newItem.id);
   }
 
-  function saveItemName(id: string, name: string) {
-    patch({ items: receipt.items.map((it) => (it.id === id ? { ...it, name } : it)) });
-  }
-
-  function saveItemPrice(id: string, price: number) {
+  function saveItem(id: string, name: string, price: number) {
     patch({
       items: receipt.items.map((it) =>
-        it.id === id ? { ...it, price: r2(price) } : it
+        it.id === id ? { ...it, name, price: r2(price) } : it
       ),
     });
+    setEditingItemId(null);
   }
 
   function deleteItem(id: string) {
@@ -407,7 +406,11 @@ export function ReceiptScreen() {
 
           {ocrError && (
             <div className="mb-4 bg-sp-surface border border-sp-hairline rounded-sp-md px-4 py-3 text-[13.5px] text-sp-text-dim flex items-start gap-2">
-              <Icon name="info" size={15} className="mt-0.5 flex-none text-sp-accent" />
+              <Icon
+                name="info"
+                size={15}
+                className="mt-0.5 flex-none text-sp-accent"
+              />
               {ocrError}
             </div>
           )}
@@ -434,11 +437,7 @@ export function ReceiptScreen() {
                 item={item}
                 isEditing={editingItemId === item.id}
                 onStartEdit={() => setEditingItemId(item.id)}
-                onSaveName={(name) => {
-                  saveItemName(item.id, name);
-                  setEditingItemId(null);
-                }}
-                onSavePrice={(price) => saveItemPrice(item.id, price)}
+                onSave={(name, price) => saveItem(item.id, name, price)}
                 onDelete={() => deleteItem(item.id)}
               />
             ))}
@@ -453,12 +452,8 @@ export function ReceiptScreen() {
 
           {/* Totals card */}
           <div className="bg-sp-surface border border-sp-hairline rounded-sp-lg mb-4 overflow-hidden shadow-sp-card-sm">
-            <TotalLine
-              label="Subtotal"
-              value={receipt.subtotal}
-              editable
-              onChange={(v) => patch({ subtotal: v })}
-            />
+            {/* Subtotal: derived from items, read-only */}
+            <TotalLine label="Subtotal" value={receipt.subtotal} />
             <TotalLine
               label="Tax"
               value={receipt.tax}
