@@ -77,23 +77,32 @@ export function SendScreen() {
     const b = calc.breakdown[personId];
     const amount = (b?.total ?? 0).toFixed(2);
     const message = `${personName} owes $${amount} for ${name || "Bill"}`;
+    let delivered = false;
 
     if (navigator.share) {
       try {
         await navigator.share({ text: message });
       } catch {
-        // user cancelled share — still mark as sent
+        // user cancelled share — share sheet was still opened
       }
+      delivered = true;
     } else {
       try {
-        if (navigator.clipboard) await navigator.clipboard.writeText(message);
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(message);
+          delivered = true;
+        }
       } catch {
-        // clipboard unavailable or denied — best-effort fallback
+        // clipboard unavailable or denied
       }
     }
 
-    setSent((prev) => ({ ...prev, [personId]: "zelle" }));
-    showToast(`Zelle message ready for ${personName}`);
+    if (delivered) {
+      setSent((prev) => ({ ...prev, [personId]: "zelle" }));
+      showToast(`Zelle message ready for ${personName}`);
+    } else {
+      showToast("Could not send — clipboard unavailable");
+    }
   }
 
   async function handleCopy(personId: string, personName: string) {

@@ -243,6 +243,32 @@ describe("<SendScreen /> — Zelle", () => {
     });
     expect(screen.getByTestId("status-zelle-alice")).toBeInTheDocument();
   });
+
+  it("does NOT show success chip when both share and clipboard are unavailable", async () => {
+    Object.defineProperty(navigator, "share", { writable: true, value: undefined });
+    Object.defineProperty(navigator, "clipboard", { writable: true, value: undefined });
+    render(<SendScreen />);
+    const [aliceZelle] = screen.getAllByRole("button", { name: /zelle/i });
+    await act(async () => {
+      fireEvent.click(aliceZelle);
+    });
+    expect(screen.queryByTestId("status-zelle-alice")).not.toBeInTheDocument();
+    expect(screen.getByTestId("toast")).toHaveTextContent(/unavailable/i);
+  });
+
+  it("does NOT show success chip when clipboard.writeText rejects and share is absent", async () => {
+    Object.defineProperty(navigator, "share", { writable: true, value: undefined });
+    Object.defineProperty(navigator, "clipboard", {
+      writable: true,
+      value: { writeText: jest.fn().mockRejectedValue(new Error("denied")) },
+    });
+    render(<SendScreen />);
+    const [aliceZelle] = screen.getAllByRole("button", { name: /zelle/i });
+    await act(async () => {
+      fireEvent.click(aliceZelle);
+    });
+    expect(screen.queryByTestId("status-zelle-alice")).not.toBeInTheDocument();
+  });
 });
 
 // ── Copy button ───────────────────────────────────────────────────────────────
