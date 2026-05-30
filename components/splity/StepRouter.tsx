@@ -6,6 +6,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { ReceiptScreen } from "./screens/ReceiptScreen";
 import { PeopleScreen } from "./screens/PeopleScreen";
 import { AssignScreen } from "./screens/AssignScreen";
+import { SummaryScreen } from "./screens/SummaryScreen";
 
 // Placeholder — replaced per-phase
 function PlaceholderScreen({ label }: { label: string }) {
@@ -17,7 +18,6 @@ function PlaceholderScreen({ label }: { label: string }) {
 }
 
 const PLACEHOLDER_LABELS = [
-  "Summary — Phase 7",
   "Send — Phase 8",
 ];
 
@@ -55,9 +55,10 @@ export function StepRouter() {
         {step === 1 && <ReceiptScreen />}
         {step === 2 && <PeopleScreen />}
         {step === 3 && <AssignScreen />}
-        {step > 3 && (
+        {step === 4 && <SummaryScreen />}
+        {step > 4 && (
           <PlaceholderScreen
-            label={PLACEHOLDER_LABELS[step - 4] ?? "Unknown step"}
+            label={PLACEHOLDER_LABELS[step - 5] ?? "Unknown step"}
           />
         )}
       </div>
