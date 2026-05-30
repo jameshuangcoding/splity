@@ -83,7 +83,36 @@ describe("normalizeOcrResponse", () => {
     expect(result.items![0].name).toBe("Pizza");
   });
 
-  it("builds place from merchant name and date", () => {
+  it("maps Tabscanner 'desc' field to item name", () => {
+    const raw = {
+      lineItems: [{ desc: "Pad Thai", lineTotal: 14.0 }],
+    };
+    const result = normalizeOcrResponse(raw);
+    expect(result.items![0].name).toBe("Pad Thai");
+  });
+
+  it("prefers 'desc' over 'description' and 'name'", () => {
+    const raw = {
+      lineItems: [{ desc: "From desc", description: "From description", name: "From name", lineTotal: 5.0 }],
+    };
+    expect(normalizeOcrResponse(raw).items![0].name).toBe("From desc");
+  });
+
+  it("builds place from top-level 'establishment' and 'date' (Tabscanner v2 format)", () => {
+    const raw = {
+      status: "done",
+      result: {
+        establishment: "Amphawa Thai",
+        date: "2026-03-21 08:47:00",
+        lineItems: [],
+        subTotal: 0,
+      },
+    };
+    const result = normalizeOcrResponse(raw);
+    expect(result.place).toBe("Amphawa Thai · 2026-03-21");
+  });
+
+  it("builds place from merchant name and date (legacy format)", () => {
     const result = normalizeOcrResponse({
       merchant: { name: "Ippudo", date: "Apr 14" },
     });

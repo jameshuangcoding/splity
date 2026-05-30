@@ -1,11 +1,11 @@
 // Proxies receipt images to Tabscanner — keeps TABSCANNER_API_KEY server-side.
-// Uses the v2 synchronous endpoint; falls back to polling if pending.
+// Tabscanner v2 is async: upload returns a token, then poll /api/result/:token.
 
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "@/lib/server-utils";
 
 const BASE = "https://api.tabscanner.com";
-const MAX_POLL = 8;
+const MAX_POLL = 10;
 const POLL_MS = 1500;
 
 async function pollResult(token: string, apiKey: string): Promise<unknown> {
@@ -40,12 +40,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = new FormData();
-    body.append("apikey", apiKey);
     body.append("file", file);
 
-    // /api/2/process is the synchronous endpoint — returns results in one shot.
+    // apikey must be a header — sending it as a form field returns "API key not found".
     const response = await fetch(`${BASE}/api/2/process`, {
       method: "POST",
+      headers: { apikey: apiKey },
       body,
     });
 
@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
 
     const data = (await response.json()) as Record<string, unknown>;
 
-    // Defensive: if v2 somehow returns pending, poll v1 result endpoint.
-    if (data.status === "pending" && typeof data.token === "string") {
+    // v2 always returns a token to poll — "success" means upload accepted, not done.
+    if (typeof data.token === "string") {
       const result = await pollResult(data.token, apiKey);
       return NextResponse.json(result);
     }

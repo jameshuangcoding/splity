@@ -323,7 +323,8 @@ export function ReceiptScreen() {
     setOcrError(null);
     try {
       const raw = await scanReceipt(file);
-      patch(normalizeOcrResponse(raw));
+      const normalized = normalizeOcrResponse(raw);
+      patch(normalized);
       setStatus("reviewing");
     } catch {
       setOcrError("Couldn't read the receipt. Enter values manually below.");
@@ -491,7 +492,7 @@ export function ReceiptScreen() {
                   <strong className="text-sp-accent">{tipRate}</strong>
                 </>
               )}{" "}
-              — then applied to each person's items.
+              — then applied to each person&apos;s items.
             </span>
           </div>
         </div>

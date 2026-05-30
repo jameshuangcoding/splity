@@ -31,7 +31,8 @@ export function normalizeOcrResponse(raw: unknown): Partial<StoreReceipt> {
   rawItems.forEach((li: unknown, i: number) => {
     if (!li || typeof li !== "object") return;
     const row = li as Record<string, unknown>;
-    const name = String(row.description ?? row.name ?? `Item ${i + 1}`);
+    // Tabscanner uses "desc"; other variants use "description" or "name".
+    const name = String(row.desc ?? row.description ?? row.name ?? `Item ${i + 1}`);
     const price = r2(getNum(row, "lineTotal", "unitPrice", "price"));
     if (price > 0) items.push({ id: `ocr-${i}`, name, price });
   });
@@ -42,12 +43,20 @@ export function normalizeOcrResponse(raw: unknown): Partial<StoreReceipt> {
   const discount = r2(getNum(data, "discount", "discountAmount"));
 
   let place = "";
-  if (data.merchant && typeof data.merchant === "object") {
-    const m = data.merchant as Record<string, unknown>;
-    const n = String(m.name ?? "").trim();
-    const d = String(m.date ?? "").trim();
-    place = [n, d].filter(Boolean).join(" · ");
-  }
+  // Tabscanner uses top-level "establishment" + "date"; some variants nest under "merchant".
+  const establishmentName =
+    typeof data.establishment === "string"
+      ? data.establishment.trim()
+      : data.merchant && typeof data.merchant === "object"
+        ? String((data.merchant as Record<string, unknown>).name ?? "").trim()
+        : "";
+  const receiptDate =
+    typeof data.date === "string"
+      ? data.date.split(" ")[0]
+      : data.merchant && typeof data.merchant === "object"
+        ? String((data.merchant as Record<string, unknown>).date ?? "").trim()
+        : "";
+  place = [establishmentName, receiptDate].filter(Boolean).join(" · ");
 
   return { subtotal, tax, tip, discount, place, items };
 }
