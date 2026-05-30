@@ -104,16 +104,17 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 5 — People Screen (Step 2) 🔲
+## Phase 5 — People Screen (Step 2) ✅
 
 > User adds participants. "You" is always the payer.
 
-- [ ] Add-name text input + square accent "+" button
-- [ ] People list card: colored `<Ava>` + name (16px/700) + `payer` chip (for You) or × remove button
-- [ ] "You" row always present, payer flag set, cannot be removed
-- [ ] New people assigned next color from palette: `#ff7a4d · #3ddc97 · #5b8cff · #c084fc` (cycle)
-- [ ] "Recent" section: quick-add name chips (e.g. Diego, Sam, Aisha, Theo)
-- [ ] People array writes to Zustand `people`; dock CTA "Next · assign items →" advances to step 3
+- [x] Add-name text input + square accent "+" button
+- [x] People list card: colored `<Ava>` + name (16px/700) + `payer` chip (for You) or × remove button
+- [x] "You" row always present, payer flag set, cannot be removed
+- [x] New people assigned next color from palette: `#ff7a4d · #3ddc97 · #5b8cff · #c084fc` (cycle)
+- [x] "Recent" section: quick-add name chips (e.g. Diego, Sam, Aisha, Theo)
+- [x] People array writes to Zustand `people`; dock CTA "Next · assign items →" advances to step 3
+- [x] **Tests:** 23 tests, 100% coverage (statements/branches/functions/lines)
 
 ---
 
@@ -131,6 +132,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] "Split the remaining N evenly" line button appears when `!calc.fullyAssigned`
 - [ ] Sheet entrance animation: `scale(0.965 → 1)` from bottom + scrim fade
 - [ ] Dock CTA "See the breakdown →" advances to step 4
+- [ ] **Tests:** `AssignScreen` + `AssignSheet` — item assignment toggles; "Everyone" selects all; `compute()` called on Done; unassigned items show chip; live rail totals update; dock CTA advances step to 4; 80%+ coverage
 
 ---
 
@@ -143,6 +145,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] Chevron rotates on expand; first person expanded by default
 - [ ] Expanded content: each assigned item with `÷N` share and per-person price; dashed divider; Item subtotal / +tax X.X% / +tip X.X% / −discount lines; payer rounding note ("Absorbs rounding remainder so the split sums exactly.")
 - [ ] Dock CTA "Send payment requests" (send icon) advances to step 5
+- [ ] **Tests:** `SummaryScreen` — per-person totals sum to receipt total exactly; expand/collapse cards; payer rounding note present; `<Money>` count-up renders; dock CTA advances step to 5; 80%+ coverage
 
 ---
 
@@ -160,6 +163,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] Toast notification: flashes near bottom, auto-dismisses after 1.9s
 - [ ] Dock: "Export to CSV" ghost CTA → `toCSV()` client-side → Blob download as `<expense-name>.csv`
 - [ ] Dock: "Done · new bill" primary CTA → resets Zustand store → back to step 0
+- [ ] **Tests:** `SendScreen` — Venmo deep link format correct; clipboard copy writes `"<name> — $X.XX"`; CSV download calls `toCSV()`; toast auto-dismisses after 1.9s; store resets on "Done · new bill"; 80%+ coverage
 
 ---
 
@@ -172,6 +176,7 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] Trigger `POST /api/bills` on transition from Summary → Send (bill is fully assigned and complete)
 - [ ] Store returned bill `id` in Zustand (useful for share links in Phase 2)
 - [ ] Auth scaffold complete: `/login` and `/signup` pages functional via Supabase Auth; no feature in Phase 1 requires login
+- [ ] **Tests:** `POST /api/bills` full payload (receipt + items + people + assignments); `GET /api/bills/[id]`; save triggered on Summary → Send transition; bill `id` written to Zustand; 80%+ coverage
 
 ---
 
@@ -186,3 +191,4 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 - [ ] Lighthouse PWA audit ≥ 90
 - [ ] Verify CSV export produces clean importable file matching receipt data
 - [ ] Verify bill total always matches receipt total exactly (payer rounding rule)
+- [ ] **Tests:** `prefers-reduced-motion` disables `<Money>` count-up; E2E full flow (Home → Send) with real data; CSV export produces correct importable file; 80%+ coverage
