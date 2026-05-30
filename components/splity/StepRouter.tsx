@@ -15,7 +15,6 @@ function PlaceholderScreen({ label }: { label: string }) {
 }
 
 const PLACEHOLDER_LABELS = [
-  "Receipt Review — Phase 4",
   "People — Phase 5",
   "Assign — Phase 6",
   "Summary — Phase 7",
