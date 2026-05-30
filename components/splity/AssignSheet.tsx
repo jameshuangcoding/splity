@@ -102,7 +102,7 @@ export function AssignSheet({
                 onClick={() => toggle(person.id)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-[11px] rounded-sp-sm",
-                  "border transition-colors duration-[120ms]",
+                  "border",
                   isSelected
                     ? "bg-sp-accent-tint border-sp-accent"
                     : "bg-sp-surface-2 border-sp-hairline-2"

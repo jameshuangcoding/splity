@@ -6,7 +6,7 @@ import { Ava, AvaStack } from "@/components/splity/Ava";
 import { Dock } from "@/components/splity/Dock";
 import { Money } from "@/components/splity/Money";
 import { AssignSheet } from "@/components/splity/AssignSheet";
-import { compute } from "@/lib/calculation/engine";
+import { compute, round2 } from "@/lib/calculation/engine";
 import { cn } from "@/lib/utils";
 
 export function AssignScreen() {
@@ -45,7 +45,7 @@ export function AssignScreen() {
     const next = { ...assignments };
     for (const item of receipt.items.filter((it) => !it.isDiscount)) {
       if (!(next[item.id] || []).length) {
-        next[item.id] = allIds;
+        next[item.id] = [...allIds];
       }
     }
     setAssignments(next);
@@ -93,7 +93,16 @@ export function AssignScreen() {
             style={{ scrollbarWidth: "none" }}
           >
             {people.map((person) => {
-              const total = calc.breakdown[person.id]?.total ?? 0;
+              const b = calc.breakdown[person.id];
+              // While not fully assigned the payer absorbs the unassigned
+              // remainder, making their total misleadingly large. Show their
+              // item-derived share instead until everything is assigned.
+              const total =
+                b == null
+                  ? 0
+                  : person.payer && !fullyAssigned
+                  ? round2(b.sub + b.tax + b.tip - b.disc)
+                  : b.total;
               return (
                 <div
                   key={person.id}
@@ -133,7 +142,7 @@ export function AssignScreen() {
                   onClick={() => setActiveItemId(item.id)}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-[13px] text-left",
-                    "active:bg-sp-surface-2 transition-colors duration-[100ms]",
+                    "active:bg-sp-surface-2",
                     i < regularItems.length - 1 &&
                       "border-b border-sp-hairline"
                   )}
@@ -179,7 +188,7 @@ export function AssignScreen() {
               className={cn(
                 "mt-4 w-full text-[14px] font-semibold text-sp-accent",
                 "py-[11px] rounded-sp-sm border border-dashed border-sp-accent/30",
-                "active:bg-sp-accent-tint transition-colors duration-[120ms]"
+                "active:bg-sp-accent-tint"
               )}
             >
               Split the remaining {unassignedCount} evenly

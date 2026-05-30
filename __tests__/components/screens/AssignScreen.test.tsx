@@ -102,7 +102,7 @@ describe("<AssignScreen /> — live rail", () => {
     expect(screen.getByTestId("rail-name-alice")).toBeInTheDocument();
   });
 
-  it("live rail totals update after assigning all items to one person", () => {
+  it("fully assigned: payer total equals receipt total", () => {
     render(<AssignScreen />);
     act(() => {
       useBillStore.getState().setAssignments({
@@ -110,9 +110,21 @@ describe("<AssignScreen /> — live rail", () => {
         "item-2": ["you"],
       });
     });
-    // receipt.total = 49.60; payer absorbs rounding, so You's total = 49.60
+    // fullyAssigned = true → payer uses remainder-absorbed total = 49.60
     const youTotal = screen.getByTestId("rail-total-you");
     expect(youTotal.textContent).toBe("$49.60");
+  });
+
+  it("partially assigned: payer shows own item-derived share, not the unassigned remainder", () => {
+    render(<AssignScreen />);
+    act(() => {
+      // Only Burger ($15) assigned to payer; Pizza unassigned
+      useBillStore.getState().setAssignments({ "item-1": ["you"] });
+    });
+    // sub=15, taxRate=0.09, tipRate=0.15 → 15*(1+0.09+0.15)=18.60
+    // Without fix, payer.total would be 49.60 (absorbing the whole receipt)
+    const youTotal = screen.getByTestId("rail-total-you");
+    expect(youTotal.textContent).toBe("$18.60");
   });
 
   it("live rail shows $0.00 for unassigned person", () => {
@@ -319,6 +331,17 @@ describe("<AssignScreen /> — split remaining", () => {
     const assignments = useBillStore.getState().assignments;
     expect(assignments["item-1"]).toEqual(["you"]); // unchanged
     expect(assignments["item-2"]).toEqual(["you", "alice"]); // newly assigned
+  });
+
+  it("each item gets an independent assignee array (no shared reference)", () => {
+    render(<AssignScreen />);
+    fireEvent.click(
+      screen.getByRole("button", { name: /split the remaining 2 evenly/i })
+    );
+    const { assignments } = useBillStore.getState();
+    // Mutating one array must not affect the other
+    assignments["item-1"].push("extra");
+    expect(assignments["item-2"]).not.toContain("extra");
   });
 });
 
