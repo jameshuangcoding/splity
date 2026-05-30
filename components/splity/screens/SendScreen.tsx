@@ -63,9 +63,14 @@ export function SendScreen() {
     const amount = (b?.total ?? 0).toFixed(2);
     const note = encodeURIComponent(name || "Bill");
     const url = `venmo://paycharge?txn=pay&recipients=&amount=${amount}&note=${note}`;
-    window.open(url, "_blank");
-    setSent((prev) => ({ ...prev, [personId]: "venmo" }));
-    showToast(`Venmo request opened for ${personName}`);
+    const result = window.open(url, "_blank");
+    // window.open returns null when blocked by the browser or no handler exists
+    if (result !== null) {
+      setSent((prev) => ({ ...prev, [personId]: "venmo" }));
+      showToast(`Venmo request opened for ${personName}`);
+    } else {
+      showToast("Venmo app not found — try Copy instead");
+    }
   }
 
   async function handleZelle(personId: string, personName: string) {
@@ -80,7 +85,11 @@ export function SendScreen() {
         // user cancelled share — still mark as sent
       }
     } else {
-      await navigator.clipboard.writeText(message);
+      try {
+        if (navigator.clipboard) await navigator.clipboard.writeText(message);
+      } catch {
+        // clipboard unavailable or denied — best-effort fallback
+      }
     }
 
     setSent((prev) => ({ ...prev, [personId]: "zelle" }));
@@ -91,7 +100,13 @@ export function SendScreen() {
     const b = calc.breakdown[personId];
     const amount = (b?.total ?? 0).toFixed(2);
     const text = `${personName} — $${amount}`;
-    await navigator.clipboard.writeText(text);
+    try {
+      if (!navigator.clipboard) throw new Error("clipboard unavailable");
+      await navigator.clipboard.writeText(text);
+    } catch {
+      showToast("Could not copy — clipboard unavailable");
+      return;
+    }
     setSent((prev) => ({ ...prev, [personId]: "copy" }));
     showToast("Copied to clipboard");
   }
@@ -116,7 +131,7 @@ export function SendScreen() {
 
   const STATUS_LABELS: Record<ActionType, string> = {
     venmo: "✓ venmo sent",
-    zelle: "✓ zelle sent",
+    zelle: "✓ message ready",
     copy: "✓ copied",
   };
 
@@ -223,6 +238,8 @@ export function SendScreen() {
       {toast.visible && (
         <div
           data-testid="toast"
+          role="status"
+          aria-live="polite"
           className={cn(
             "fixed bottom-[100px] left-1/2 -translate-x-1/2 z-50",
             "bg-sp-text text-sp-bg",

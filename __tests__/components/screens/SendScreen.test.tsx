@@ -159,11 +159,29 @@ describe("<SendScreen /> — Venmo deep link", () => {
     expect(url).toMatch(/amount=\d+\.\d{2}/);
   });
 
-  it("shows '✓ venmo sent' status after clicking Venmo", () => {
+  it("shows '✓ venmo sent' status when window.open succeeds (returns non-null)", () => {
+    mockWindowOpen.mockReturnValue({} as Window);
     render(<SendScreen />);
     const [aliceVenmo] = screen.getAllByRole("button", { name: /venmo/i });
     fireEvent.click(aliceVenmo);
     expect(screen.getByTestId("status-venmo-alice")).toBeInTheDocument();
+  });
+
+  it("does NOT show '✓ venmo sent' when window.open returns null (popup blocked)", () => {
+    mockWindowOpen.mockReturnValue(null);
+    render(<SendScreen />);
+    const [aliceVenmo] = screen.getAllByRole("button", { name: /venmo/i });
+    fireEvent.click(aliceVenmo);
+    expect(screen.queryByTestId("status-venmo-alice")).not.toBeInTheDocument();
+  });
+
+  it("shows fallback toast when window.open returns null", () => {
+    mockWindowOpen.mockReturnValue(null);
+    render(<SendScreen />);
+    const [aliceVenmo] = screen.getAllByRole("button", { name: /venmo/i });
+    fireEvent.click(aliceVenmo);
+    expect(screen.getByTestId("toast")).toBeInTheDocument();
+    expect(screen.getByTestId("toast")).toHaveTextContent(/not found/i);
   });
 });
 
@@ -255,6 +273,32 @@ describe("<SendScreen /> — Copy", () => {
     });
     expect(screen.getByTestId("status-copy-alice")).toBeInTheDocument();
   });
+
+  it("does NOT show success chip when clipboard.writeText rejects", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      writable: true,
+      value: { writeText: jest.fn().mockRejectedValue(new Error("denied")) },
+    });
+    render(<SendScreen />);
+    const [aliceCopy] = screen.getAllByRole("button", { name: /copy/i });
+    await act(async () => {
+      fireEvent.click(aliceCopy);
+    });
+    expect(screen.queryByTestId("status-copy-alice")).not.toBeInTheDocument();
+  });
+
+  it("does NOT show success chip when clipboard is unavailable", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      writable: true,
+      value: undefined,
+    });
+    render(<SendScreen />);
+    const [aliceCopy] = screen.getAllByRole("button", { name: /copy/i });
+    await act(async () => {
+      fireEvent.click(aliceCopy);
+    });
+    expect(screen.queryByTestId("status-copy-alice")).not.toBeInTheDocument();
+  });
 });
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
@@ -275,6 +319,15 @@ describe("<SendScreen /> — toast", () => {
       fireEvent.click(aliceCopy);
     });
     expect(screen.getByTestId("toast")).toBeInTheDocument();
+  });
+
+  it("toast has aria-live='polite' for screen reader announcements", async () => {
+    render(<SendScreen />);
+    const [aliceCopy] = screen.getAllByRole("button", { name: /copy/i });
+    await act(async () => {
+      fireEvent.click(aliceCopy);
+    });
+    expect(screen.getByTestId("toast")).toHaveAttribute("aria-live", "polite");
   });
 
   it("toast auto-dismisses after 1.9s", async () => {
