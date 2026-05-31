@@ -2,7 +2,7 @@
 
 Work through these phases in order. Each phase is a self-contained unit — get approval before starting the next one.
 
-**Status key:** 🔲 Not started · 🔄 In progress · ✅ Done
+**Status key:** 🔲 Not started · 🔄 In progress · ✅ Done · ⏸️ Deferred (post-MVP, see `ROADMAP.md`)
 
 > **TDD rule (all phases from here on):** write tests first, implement to green, then commit. Minimum 80% coverage per phase. Run `npm test` before every PR.
 
@@ -149,38 +149,37 @@ Work through these phases in order. Each phase is a self-contained unit — get 
 
 ---
 
-## Phase 8 — Send Screen (Step 5) 🔲
+## Phase 8 — Send Screen (Step 5) ✅
 
 > Generate payment requests and export.
 
-- [ ] Title "Collect what you're owed" + memo chip `memo · "<expense name>"`
-- [ ] Per non-payer card: `<Ava>` + name + amount (21px/700)
-- [ ] Button row per person: **Venmo** · **Zelle** · **Copy** (icon-only buttons)
-- [ ] Venmo: opens deep link `venmo://paycharge?txn=pay&recipients=@user&amount=XX.XX&note=<name>`
-- [ ] Zelle: Web Share API with pre-filled message; clipboard fallback
-- [ ] Copy: writes `"<name> — $X.XX"` to clipboard
-- [ ] After action: row shows green "✓ venmo sent" / "✓ zelle sent" / "✓ copied" status
-- [ ] Toast notification: flashes near bottom, auto-dismisses after 1.9s
-- [ ] Dock: "Export to CSV" ghost CTA → `toCSV()` client-side → Blob download as `<expense-name>.csv`
-- [ ] Dock: "Done · new bill" primary CTA → resets Zustand store → back to step 0
-- [ ] **Tests:** `SendScreen` — Venmo deep link format correct; clipboard copy writes `"<name> — $X.XX"`; CSV download calls `toCSV()`; toast auto-dismisses after 1.9s; store resets on "Done · new bill"; 80%+ coverage
+- [x] Title "Collect what you're owed" + memo chip `memo · "<expense name>"`
+- [x] Per non-payer card: `<Ava>` + name + amount (21px/700)
+- [x] Button row per person: **Venmo** · **Zelle** · **Copy** (icon-only buttons)
+- [x] Venmo: opens deep link `venmo://paycharge?txn=pay&recipients=@user&amount=XX.XX&note=<name>`; gates success chip on `window.open` return value
+- [x] Zelle: Web Share API with pre-filled message; clipboard fallback; no false success when both APIs absent
+- [x] Copy: writes `"<name> — $X.XX"` to clipboard; guards with existence check + try/catch
+- [x] After action: row shows green "✓ venmo sent" / "✓ message ready" / "✓ copied" status
+- [x] Toast notification: flashes near bottom, auto-dismisses after 1.9s; `aria-live="polite"` for screen readers
+- [x] Dock: "Export to CSV" ghost CTA → `toCSV()` client-side → Blob download as `<expense-name>.csv`
+- [x] Dock: "Done · new bill" primary CTA → resets Zustand store → back to step 0
+- [x] **Tests:** 38 tests, 84.6% branch / 100% stmt coverage; Venmo deep link format, null gate, clipboard copy, clipboard guard, CSV download, toast a11y, store reset; 331 total passing
 
 ---
 
-## Phase 9 — Persistence 🔲
+## Phase 9 — Persistence ⏸️ Deferred (post-MVP)
 
-> Bills are saved to Supabase so Phase 2 account-linking is a data migration, not a rebuild.
-
-- [ ] `POST /api/bills` — saves bill (receipt + items + people + assignments) via Prisma → Supabase
-- [ ] `GET /api/bills/[id]` — retrieves a saved bill by ID
-- [ ] Trigger `POST /api/bills` on transition from Summary → Send (bill is fully assigned and complete)
-- [ ] Store returned bill `id` in Zustand (useful for share links in Phase 2)
-- [ ] Auth scaffold complete: `/login` and `/signup` pages functional via Supabase Auth; no feature in Phase 1 requires login
-- [ ] **Tests:** `POST /api/bills` full payload (receipt + items + people + assignments); `GET /api/bills/[id]`; save triggered on Summary → Send transition; bill `id` written to Zustand; 80%+ coverage
+> **Deferred — not part of the MVP.** Moved to `ROADMAP.md`.
+>
+> Persistence is write-only with no reader in the MVP: nothing consumes a saved bill (check history, "my bills", and share links are all post-MVP), so saving to Supabase delivers no user-facing value yet. It's also coupled to accounts/auth, which nothing is gated on. The end-to-end flow (Home → Send → CSV export → new bill) is complete without it, and CSV export already covers record-keeping for a no-account tool.
+>
+> The Phase 1 API stubs (`POST /api/bills`, `GET /api/bills/[id]`) remain as tested scaffolding — only the Summary→Send save trigger and the auth scaffold are deferred. Pick this up together with accounts + history. See `ROADMAP.md`.
 
 ---
 
 ## Phase 10 — Polish, PWA & Deploy 🔲
+
+> **MVP finish line.** With Phase 9 deferred, this is the last phase required to ship.
 
 > Ship it.
 
